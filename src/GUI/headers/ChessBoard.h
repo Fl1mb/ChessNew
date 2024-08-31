@@ -40,6 +40,11 @@ public:
     uint8_t getBlackStatus();
     uint8_t getWhiteStatus();
 
+    const Position &getPosition();
+
+    void setKingChecked(uint8_t side_);
+    void deleteCheck();
+
     void setPosition(const Position& position_);
 
     void closeEvent(QCloseEvent* event)override;
@@ -65,12 +70,13 @@ public slots:
 signals:
     void UpdatePosition(const Position& position, uint8_t side);
     void Moved();
-    void SentStatus(uint8_t status);
+    void SentStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> To, uint8_t side_);
 
 
 private:
     QGraphicsScene* scene;
     std::array<std::array<BoardElement*, 8>, 8> Elements;
+    BoardElement* CheckedSquare;
 
     QPair<uint8_t, uint8_t> buffer;
     std::list<uint8_t> LastPossibleMoves;

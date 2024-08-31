@@ -9,7 +9,8 @@ BoardElement::BoardElement(ColorOfSquare color_, qreal x_, qreal y_, uint8_t ver
       PossibleMove(false),
       horizontal(goriz),
       vertical(vert),
-      FigureDisable(false)
+      FigureDisable(false),
+      isChecked(false)
 {
     this->side = WHITE; // default side
     this->piece = NONE;
@@ -51,6 +52,12 @@ void BoardElement::setLetters(char Num, char let) {
     }
 }
 
+void BoardElement::setChecked(bool checked)
+{
+    this->isChecked = checked;
+    this->update();
+}
+
 uint8_t BoardElement::getSide() const
 {
     return this->side;
@@ -59,6 +66,11 @@ uint8_t BoardElement::getSide() const
 uint8_t BoardElement::getPiece() const
 {
     return this->piece;
+}
+
+QPair<uint8_t, uint8_t> BoardElement::getCoordinates() const
+{
+    return QPair<uint8_t, uint8_t>(this->vertical, this->horizontal);
 }
 
 QRectF BoardElement::boundingRect() const
@@ -123,6 +135,19 @@ void BoardElement::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
         painter->drawPixmap(boundingRect().center().x() - pixmap.width() / 2 ,  boundingRect().center().y() - pixmap.height() / 2, pixmap);
     }
 
+    if (isChecked) {
+        QColor redColor(Qt::red);
+        redColor.setAlpha(192); // Increase alpha for a more vibrant color
+        painter->setRenderHint(QPainter::Antialiasing);
+        painter->setBrush(redColor);
+
+        // Draw a thicker, dashed circle to emphasize the king is under check
+        QPen pen(Qt::red, 2, Qt::DashLine, Qt::RoundCap, Qt::RoundJoin);
+        painter->setPen(pen);
+        QRectF rect = this->boundingRect();
+        QPointF center = rect.center();
+        painter->drawEllipse(center.x() - 12, center.y() - 11, 24, 24);
+    }
 
     if (PossibleMove) {
         QColor color(Qt::blue);
@@ -140,7 +165,6 @@ void BoardElement::mousePressEvent(QGraphicsSceneMouseEvent *event)
     if(PossibleMove){
         //Если этот квадратик - один из возможных ходов, то мы посылаем движку данную координату
         emit MakeMove(QPair<uint8_t, uint8_t>(this->horizontal, this->vertical));
-        qDebug() << this->vertical << " " << this->horizontal;
         return;
     }
     if(this->piece == Position::NONE)

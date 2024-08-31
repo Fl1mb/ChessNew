@@ -30,9 +30,11 @@ public:
     void setPossible(bool isPossible);
     void setFigureDisable();
     void setLetters(char Num, char let);
+    void setChecked(bool checked);
 
     uint8_t getSide()const;
     uint8_t getPiece() const;
+    QPair<uint8_t, uint8_t> getCoordinates() const;
 
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
@@ -61,7 +63,7 @@ private:
     ColorOfSquare color;
     bool PossibleMove;
     bool FigureDisable;
-
+    bool isChecked;
 
     QString NumCRD;
     QString LetCRD;

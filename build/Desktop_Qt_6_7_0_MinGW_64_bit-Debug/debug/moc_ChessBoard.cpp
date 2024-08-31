@@ -45,8 +45,11 @@ constexpr auto qt_meta_stringdata_CLASSChessBoardENDCLASS = QtMocHelpers::string
     "Moved",
     "SentStatus",
     "status",
-    "getFigurePrepared",
     "std::pair<uint8_t,uint8_t>",
+    "from",
+    "To",
+    "side_",
+    "getFigurePrepared",
     "figure",
     "getFigureMoved",
     "to"
@@ -72,20 +75,20 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSChessBoardENDCLASS[] = {
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
        1,    2,   44,    2, 0x06,    1 /* Public */,
        7,    0,   49,    2, 0x06,    4 /* Public */,
-       8,    1,   50,    2, 0x06,    5 /* Public */,
+       8,    4,   50,    2, 0x06,    5 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      10,    1,   53,    2, 0x0a,    7 /* Public */,
-      13,    1,   56,    2, 0x0a,    9 /* Public */,
+      14,    1,   59,    2, 0x0a,   10 /* Public */,
+      16,    1,   62,    2, 0x0a,   12 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 5,    4,    6,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 5,    9,
+    QMetaType::Void, 0x80000000 | 5, 0x80000000 | 10, 0x80000000 | 10, 0x80000000 | 5,    9,   11,   12,   13,
 
  // slots: parameters
-    QMetaType::Void, 0x80000000 | 11,   12,
-    QMetaType::Void, 0x80000000 | 11,   14,
+    QMetaType::Void, 0x80000000 | 10,   15,
+    QMetaType::Void, 0x80000000 | 10,   17,
 
        0        // eod
 };
@@ -108,6 +111,9 @@ Q_CONSTINIT const QMetaObject ChessBoard::staticMetaObject = { {
         // method 'SentStatus'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<uint8_t, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QPair<uint8_t,uint8_t>, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QPair<uint8_t,uint8_t>, std::false_type>,
+        QtPrivate::TypeAndForceComplete<uint8_t, std::false_type>,
         // method 'getFigurePrepared'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QPair<uint8_t,uint8_t>, std::false_type>,
@@ -126,7 +132,7 @@ void ChessBoard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         switch (_id) {
         case 0: _t->UpdatePosition((*reinterpret_cast< std::add_pointer_t<Position>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[2]))); break;
         case 1: _t->Moved(); break;
-        case 2: _t->SentStatus((*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[1]))); break;
+        case 2: _t->SentStatus((*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[4]))); break;
         case 3: _t->getFigurePrepared((*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[1]))); break;
         case 4: _t->getFigureMoved((*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[1]))); break;
         default: ;
@@ -148,7 +154,7 @@ void ChessBoard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
             }
         }
         {
-            using _t = void (ChessBoard::*)(uint8_t );
+            using _t = void (ChessBoard::*)(uint8_t , QPair<uint8_t,uint8_t> , QPair<uint8_t,uint8_t> , uint8_t );
             if (_t _q_method = &ChessBoard::SentStatus; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 2;
                 return;
@@ -201,9 +207,9 @@ void ChessBoard::Moved()
 }
 
 // SIGNAL 2
-void ChessBoard::SentStatus(uint8_t _t1)
+void ChessBoard::SentStatus(uint8_t _t1, QPair<uint8_t,uint8_t> _t2, QPair<uint8_t,uint8_t> _t3, uint8_t _t4)
 {
-    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t4))) };
     QMetaObject::activate(this, &staticMetaObject, 2, _a);
 }
 QT_WARNING_POP

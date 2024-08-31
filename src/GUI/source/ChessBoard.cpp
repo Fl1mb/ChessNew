@@ -8,6 +8,7 @@ ChessBoard::ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphi
 {
     this->resize(ChessBoard::size);
     scene = new QGraphicsScene;
+    CheckedSquare = nullptr;
     this->drawBoard();
     this->addFigures();
     this->setScene(scene);
@@ -61,40 +62,20 @@ void ChessBoard::drawBoard()
 
 void ChessBoard::addFigures()
 {
-    if(this->side == WHITE){
-        for(int32_t x = 0; x < 8; x++){
-            for(int32_t y = 0; y < 8; y++){
-                QPair<uint8_t, uint8_t> SideName = this->getTextureName(x, y);
-                if(SideName.first == Position::NONE){
-                    Elements[x][y]->setFigure(BoardElement::NONE, BoardElement::NONE);
-                    Elements[x][y]->update();
-                    continue;
-                }
-
-                Elements[x][y]->setFigure(SideName.first, SideName.second);
-                Elements[x][y]->setPossible(false);
+    for(int32_t x = 0; x < 8; x++){
+        for(int32_t y = 0; y < 8; y++){
+            QPair<uint8_t, uint8_t> SideName = this->getTextureName(x, y);
+            if(SideName.first == Position::NONE){
+                Elements[x][y]->setFigure(BoardElement::NONE, BoardElement::NONE);
                 Elements[x][y]->update();
+                continue;
             }
-        }
-    }else{
-        for(int32_t x = 0; x < 8; x++){
-            for(int32_t y = 0; y < 8; y++){
-                QPair<uint8_t, uint8_t> SideName = this->getTextureName(x, y);
-                if(SideName.first == Position::NONE){
-                    Elements[x][y]->setFigure(BoardElement::NONE, BoardElement::NONE);
-                    Elements[x][y]->update();
-                    continue;
-                }
 
-                Elements[x][y]->setFigure(SideName.first, SideName.second);
-                Elements[x][y]->setPossible(false);
-
-                Elements[x][y]->update();
-            }
+            Elements[x][y]->setFigure(SideName.first, SideName.second);
+            Elements[x][y]->setPossible(false);
+            Elements[x][y]->update();
         }
     }
-
-
 }
 
 void ChessBoard::MoveFigure(uint8_t from, uint8_t to)
@@ -119,30 +100,6 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to)
     Elements[x1][y1]->setFigure(Move::NONE, Move::NONE);
 
     uint8_t status = getStatus();
-    switch(status){
-    case GameStatus::DRAW:
-        qDebug() <<"draw";
-        break;
-    case GameStatus::BLACK_WIN:
-        qDebug() << "Black Win";
-        break;
-    case GameStatus::WHITE_WIN:
-        qDebug() << "White win";
-        break;
-    case GameStatus::BLACK_TO_MOVE:
-        qDebug() << "Black to move";
-        break;
-    case GameStatus::WHITE_TO_MOVE:
-        qDebug() << "White to move";
-        break;
-    case GameStatus::BLACK_CHECKED:
-        qDebug() << "Black Checked";
-        break;
-    case GameStatus::WHITE_CHECKED:
-        qDebug() << "White checked";
-        break;
-    }
-
     for(auto i = 0; i  < 8; i ++){
         for (auto j = 0; j  < 8; j++){
             Elements[i][j]->setPossible(false);
@@ -154,7 +111,10 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to)
     Elements[x1][y1]->update();
 
     IsFigureChosen = false;
+    QPair<uint8_t, uint8_t> FROM = Elements[x1][y1]->getCoordinates();
+    QPair<uint8_t, uint8_t>TO = Elements[x2][y2]->getCoordinates();
     emit Moved();
+    emit SentStatus(status, FROM, TO, this->side);
 }
 
 void ChessBoard::ChangeLetters(uint8_t Side_) {
@@ -233,6 +193,42 @@ uint8_t ChessBoard::getWhiteStatus() {
     } else {
         return GameStatus::WHITE_TO_MOVE;
     }
+}
+
+const Position &ChessBoard::getPosition()
+{
+    return this->position;
+}
+
+void ChessBoard::setKingChecked(uint8_t side_)
+{
+    if(side_ == WHITE){
+        for(auto i = 0; i < 8; i ++ ){
+            for(auto j = 0; j < 8; j++){
+                if(Elements[i][j]->getPiece() == PIECE::KING and Elements[i][j]->getSide() == BLACK){
+                    Elements[i][j]->setChecked(true);
+                    CheckedSquare = Elements[i][j];
+                    return;
+                }
+            }
+        }
+    }else{
+        for(auto i = 0; i < 8; i ++ ){
+            for(auto j = 0; j < 8; j++){
+                if(Elements[i][j]->getPiece() == PIECE::KING and Elements[i][j]->getSide() == WHITE){
+                    Elements[i][j]->setChecked(true);
+                    CheckedSquare = Elements[i][j];
+                    return;
+                }
+            }
+        }
+    }
+}
+
+void ChessBoard::deleteCheck()
+{
+    if(CheckedSquare != nullptr)
+        CheckedSquare->setChecked(false);
 }
 
 uint8_t ChessBoard::getStatus()
