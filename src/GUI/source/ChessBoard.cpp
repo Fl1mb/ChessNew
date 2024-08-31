@@ -61,20 +61,39 @@ void ChessBoard::drawBoard()
 
 void ChessBoard::addFigures()
 {
-    for(int32_t x = 0; x < 8; x++){
-        for(int32_t y = 0; y < 8; y++){
-            QPair<uint8_t, uint8_t> SideName = this->getTextureName(x, y);
-            if(SideName.first == Position::NONE){
-                Elements[x][y]->setFigure(BoardElement::NONE, BoardElement::NONE);
-                Elements[x][y]->update();
-                continue;
-            }
+    if(this->side == WHITE){
+        for(int32_t x = 0; x < 8; x++){
+            for(int32_t y = 0; y < 8; y++){
+                QPair<uint8_t, uint8_t> SideName = this->getTextureName(x, y);
+                if(SideName.first == Position::NONE){
+                    Elements[x][y]->setFigure(BoardElement::NONE, BoardElement::NONE);
+                    Elements[x][y]->update();
+                    continue;
+                }
 
-            Elements[x][y]->setFigure(SideName.first, SideName.second);
-            Elements[x][y]->setPossible(false);
-            Elements[x][y]->update();
+                Elements[x][y]->setFigure(SideName.first, SideName.second);
+                Elements[x][y]->setPossible(false);
+                Elements[x][y]->update();
+            }
+        }
+    }else{
+        for(int32_t x = 0; x < 8; x++){
+            for(int32_t y = 0; y < 8; y++){
+                QPair<uint8_t, uint8_t> SideName = this->getTextureName(x, y);
+                if(SideName.first == Position::NONE){
+                    Elements[x][y]->setFigure(BoardElement::NONE, BoardElement::NONE);
+                    Elements[x][y]->update();
+                    continue;
+                }
+
+                Elements[x][y]->setFigure(SideName.first, SideName.second);
+                Elements[x][y]->setPossible(false);
+
+                Elements[x][y]->update();
+            }
         }
     }
+
 
 }
 
@@ -87,27 +106,149 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to)
     uint8_t x2 = to % 8;
     uint8_t y2 = to / 8;
 
-    qDebug() <<  "Move to :"<< x2 << " " << y2;
-
     uint8_t flag = this->getFlagOfMove(from, to);
 
-    this->position.move(Move(from, to, Elements[x1][y1]->getPiece(), Elements[x1][y1]->getSide(),Elements[x2][y2]->getPiece(), Elements[x2][y2]->getSide(), flag));
+    if(this->side == BLACK){
+        from = (7 - y1)* 8 + (7 - x1);
+        to = (7 - y2) * 8 + (7 - x2);
+    }
 
+
+    this->position.move(Move(from, to, Elements[x1][y1]->getPiece(), Elements[x1][y1]->getSide(),Elements[x2][y2]->getPiece(), Elements[x2][y2]->getSide(), flag));
     Elements[x2][y2]->setFigure(Elements[x1][y1]->getSide(), Elements[x1][y1]->getPiece());
     Elements[x1][y1]->setFigure(Move::NONE, Move::NONE);
 
-    for(uint8_t iter : LastPossibleMoves){
-        uint8_t x = iter % 8;
-        uint8_t y =  iter / 8 ;
-        Elements[x][y]->setPossible(false);
-        Elements[x][y]->update();
+    uint8_t status = getStatus();
+    switch(status){
+    case GameStatus::DRAW:
+        qDebug() <<"draw";
+        break;
+    case GameStatus::BLACK_WIN:
+        qDebug() << "Black Win";
+        break;
+    case GameStatus::WHITE_WIN:
+        qDebug() << "White win";
+        break;
+    case GameStatus::BLACK_TO_MOVE:
+        qDebug() << "Black to move";
+        break;
+    case GameStatus::WHITE_TO_MOVE:
+        qDebug() << "White to move";
+        break;
+    case GameStatus::BLACK_CHECKED:
+        qDebug() << "Black Checked";
+        break;
+    case GameStatus::WHITE_CHECKED:
+        qDebug() << "White checked";
+        break;
+    }
+
+    for(auto i = 0; i  < 8; i ++){
+        for (auto j = 0; j  < 8; j++){
+            Elements[i][j]->setPossible(false);
+            Elements[i][j]->update();
+        }
     }
 
     Elements[x2][y2]->update();
     Elements[x1][y1]->update();
 
     IsFigureChosen = false;
-    emit ChessBoard::UpdatePosition(this->position, this->side);
+    emit Moved();
+}
+
+void ChessBoard::ChangeLetters(uint8_t Side_) {
+    if (Side_ == WHITE) {
+        for (auto i = 0; i < 8; i++) {
+            Elements[0][i]->setLetters('8' - i, '\0');
+        }
+        for (auto i = 0; i < 8; i++) {
+            Elements[i][7]->setLetters('\0', 'a' + i);
+        }
+    } else {
+        for (auto i = 0; i < 8; i++) {
+            Elements[0][i]->setLetters('1' + i, '\0');
+        }
+        for (auto i = 0; i < 8; i++) {
+            Elements[i][7]->setLetters('\0', 'h' - i);
+        }
+    }
+}
+
+bool ChessBoard::isInsufficientMaterial()
+{
+    return !this->position.getPieces().getPieceBitBoard(SIDE::WHITE, PIECE::PAWN) &&
+            !this->position.getPieces().getPieceBitBoard(SIDE::BLACK, PIECE::PAWN) &&
+            !this->position.getPieces().getPieceBitBoard(SIDE::WHITE, PIECE::ROOK) &&
+            !this->position.getPieces().getPieceBitBoard(SIDE::BLACK, PIECE::ROOK) &&
+            !this->position.getPieces().getPieceBitBoard(SIDE::WHITE, PIECE::QUEEN) &&
+            !this->position.getPieces().getPieceBitBoard(SIDE::BLACK, PIECE::QUEEN) &&
+            BitBoardOperations::count_1(this->position.getPieces().getPieceBitBoard(SIDE::WHITE, PIECE::KNIGHT) |
+                                        this->position.getPieces().getPieceBitBoard(SIDE::WHITE, PIECE::BISHOP)) < 2 &&
+            BitBoardOperations::count_1(this->position.getPieces().getPieceBitBoard(SIDE::BLACK, PIECE::KNIGHT) |
+                                        this->position.getPieces().getPieceBitBoard(SIDE::BLACK, PIECE::BISHOP)) < 2;
+
+}
+
+bool ChessBoard::isInCheck(uint8_t side_) {
+    MoveList moves = LegalMoveGen::generate(this->position, side_);
+    for (auto i = 0; i < moves.size(); i++){
+        uint8_t x = moves[i].getTo() % 8;
+        uint8_t y = moves[i].getTo() / 8;
+        if(this->side == BLACK){
+            x = 7 - x;
+            y = 7 - y;
+        }
+        if (Elements[x][y]->getPiece() == PIECE::KING && Elements[x][y]->getSide() != side_) {
+            return true;
+        }
+    }
+    return false;
+}
+uint8_t ChessBoard::getBlackStatus() {
+    MoveList moves = LegalMoveGen::generate(this->position, WHITE);
+    if (moves.size() == 0) {
+        if (isInCheck(BLACK)) {
+            return GameStatus::WHITE_WIN;
+        } else {
+            return GameStatus::DRAW;
+        }
+    } else if (isInCheck(BLACK)) {
+        return GameStatus::BLACK_CHECKED;
+    } else {
+        return GameStatus::BLACK_TO_MOVE;
+    }
+}
+
+uint8_t ChessBoard::getWhiteStatus() {
+    MoveList moves = LegalMoveGen::generate(this->position, BLACK);
+    if (moves.size() == 0) {
+        if (isInCheck(WHITE)) {
+            return GameStatus::BLACK_WIN;
+        } else {
+            return GameStatus::DRAW;
+        }
+    } else if (isInCheck(WHITE)) {
+        return GameStatus::WHITE_CHECKED;
+    } else {
+        return GameStatus::WHITE_TO_MOVE;
+    }
+}
+
+uint8_t ChessBoard::getStatus()
+{
+    if(this->position.fiftyMovesRuleDraw() || this->position.threefoldRepetitionDraw()){
+        return GameStatus::DRAW;
+    }
+    if(this->isInsufficientMaterial()){
+        return GameStatus::DRAW;
+    }
+
+    if(this->position.blackToMove()){
+        return getBlackStatus();
+    }else{
+        return getWhiteStatus();
+    }
 }
 
 void ChessBoard::setPosition(const Position &position_)
@@ -135,14 +276,29 @@ void ChessBoard::closeEvent(QCloseEvent *event)
 
 void ChessBoard::ChangeSide(uint8_t Side_)
 {
-    this->side = Side_;
+    this->side = this->side == WHITE? BLACK : WHITE;
+    this->ChangeLetters(this->side);
     this->addFigures();
+}
+
+void ChessBoard::TransformCoordinates(uint8_t &x, uint8_t &y)
+{
+    x = 7- x;
+    y = 7 - y;
+}
+
+uint8_t ChessBoard::getPromotionChoice()
+{
+
 }
 
 QPair<uint8_t, uint8_t> ChessBoard::getTextureName(int32_t x, int32_t y)
 {
     std::array<std::array<BitBoard, 6>, 2> bs = this->position.getPieces().getPieceBitBoards();
     int32_t id = y * 8 + x;
+    if(this->side == BLACK){
+        id = (7 - y) * 8 + (7 - x);
+    }
 
     if (BitBoardOperations::getBit(bs[WHITE][PAWN], id)) {
         return QPair<uint8_t, uint8_t>(WHITE, PAWN);
@@ -203,35 +359,38 @@ uint8_t ChessBoard::getFlagOfMove(uint8_t from, uint8_t to)
     uint8_t x2 = to % 8;
     uint8_t y2 = to / 8;
 
-    if (this->side == BLACK) {
-        x1 = 7 - x1;
-        y1 = 7 - y1;
-        x2 = 7 - x2;
-        y2 = 7 - y2;
-    }
 
     uint8_t piece = Elements[x1][y1]->getPiece();
+    uint8_t PieceSide = Elements[x1][y1]->getSide();
+
+    uint8_t dy = std::abs(y2 - y1);
+    uint8_t dx = x2 - x1;
 
     if(piece == PIECE::PAWN){
-        if (y1 == 1 && y2 == 3 && x1 == x2) { // pawn long move
+        if(y2 == 0 or y2 == 7){
+            return this->getPromotionChoice();
+        }
+        if(dy == 2)
             return Move::FLAGS::PAWN_LONG_MOVE;
-        } else if (y1 == 6 && y2 == 4 && x1 == x2) { // pawn long move
-            return Move::FLAGS::PAWN_LONG_MOVE;
-        } else if (x1 != x2 && Elements[x2][y2]->getPiece() == PAWN && Elements[x2][y2]->getSide() != Elements[x1][y1]->getSide()) { // en passant capture
+        else if(dy == 1 and dx == 1)
             return Move::FLAGS::EN_PASSANT_CAPTURE;
+        else if(dy == 1 and dx != 1)
+            return Move::FLAGS::DEFAULT;
+    }
+    else if(piece == PIECE::KING and dy == 0){
+        if(PieceSide != WHITE){
+            if(x2 == 2){
+                return Move::BL_CASTLING;
+            }else{
+                return Move::BS_CASTLING;
+            }
+        }else{
+            if(x2 == 1){
+                return Move::WS_CASTLING;
+            }else{
+                return Move::WL_CASTLING;
+            }
         }
-    }else if(piece == PIECE::KING){
-        if (x1 == 4 && x2 == 6 && y1 == y2) { // white king-side castling
-            return Move::FLAGS::WS_CASTLING;
-        } else if (x1 == 4 && x2 == 2 && y1 == y2) { // white queen-side castling
-            return Move::FLAGS::WL_CASTLING;
-        } else if (x1 == 4 && x2 == 6 && y1 == y2) { // black king-side castling
-            return Move::FLAGS::BS_CASTLING;
-        } else if (x1 == 4 && x2 == 2 && y1 == y2) { // black queen-side castling
-            return Move::FLAGS::BL_CASTLING;
-        }
-    }else if(piece == PIECE::PAWN && y2 == 7){
-        return Move::FLAGS::PROMOTE_TO_QUEEN;
     }
     return Move::FLAGS::DEFAULT;
 
@@ -252,31 +411,20 @@ void ChessBoard::getFigurePrepared(QPair<uint8_t, uint8_t> figure)
     BoardElement* element = Elements[figure.first][figure.second];
 
     MoveList moves = LegalMoveGen::generate(this->position, element->getSide());
-
-    qDebug() << this->position.getHash().getValue();
-
-    qDebug () << moves.size();
     for(uint8_t i = 0; i < moves.size();i ++){
-        uint8_t fromX = 7 -moves[i].getFrom() % 8;
-        uint8_t fromY =7 -  moves[i].getTo() / 8;
-
-        qDebug() << fromX << " " << fromY;
-
         if(this->side == WHITE){
             if (moves[i].getFrom() == figure.second * 8 + figure.first) {
                 LastPossibleMoves.push_back(moves[i].getTo());
                 uint8_t x = moves[i].getTo() % 8;
                 uint8_t y = moves[i].getTo() / 8;
-                qDebug() << "Possible x: " << x << " Possible y: " << y;
                 Elements[x][y]->setPossible(true);
             }
         }
         else{
-            if (moves[i].getFrom() == (7 - figure.second )* 8 + (7 - figure.first)) {
+            if (moves[i].getFrom() == (7 - figure.second )* 8 + (7  - figure.first)) {
                 LastPossibleMoves.push_back(moves[i].getTo());
                 uint8_t x = 7 -moves[i].getTo() % 8;
                 uint8_t y = 7 - moves[i].getTo() / 8;
-                qDebug() << "Possible x: " << x << " Possible y: " << y;
                 Elements[x][y]->setPossible(true);
             }
         }

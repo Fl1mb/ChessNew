@@ -10,44 +10,25 @@
 #include "src/GUI/headers/ChessBoard.h"
 #include <memory>
 
-enum GameStatus{
-    CHECK,
-    MATE,
-    STALEMATE
-};
-
-
-
 class ChessGUI : public QMainWindow{
     Q_OBJECT
 public:
     ChessGUI(QMainWindow* parent = nullptr);
 
-
-
-
 public slots:
-    void PlayWithAI();
-    void PlayWithFriend();
 
-    void SentPositionToOther(const Position& position, uint8_t FromWho);
 
 private:
     void init();
     void makeConnections();
 
-    QString ChangeBlackPosToWhite(const QString& position);
 
-    std::unique_ptr<ChessBoard> BlackBoard;
-    std::unique_ptr<ChessBoard> WhiteBoard;
+    std::unique_ptr<ChessBoard> Board;
+    std::unique_ptr<QWidget> CentralWidget;
+    std::unique_ptr<QVBoxLayout> VerticalLayout;
 
 
-    std::unique_ptr<QPushButton> makeMoveButton;
-    std::unique_ptr<QPushButton> startPlayWithAI;
-    std::unique_ptr<QPushButton> startPlayWithFriend;
-    std::unique_ptr<QGridLayout> layout;
-    std::unique_ptr<QWidget> centralWidget;
-
+    Position StartPosition{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",Position::NONE, true, true, true, true, 1 };
     GameStatus status;
     SIDE playerTurn;
 };

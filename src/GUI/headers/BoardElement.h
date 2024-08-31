@@ -29,6 +29,7 @@ public:
     void setFigure(uint8_t side_, uint8_t piece_);
     void setPossible(bool isPossible);
     void setFigureDisable();
+    void setLetters(char Num, char let);
 
     uint8_t getSide()const;
     uint8_t getPiece() const;

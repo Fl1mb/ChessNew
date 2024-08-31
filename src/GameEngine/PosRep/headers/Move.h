@@ -28,7 +28,7 @@ public:
 
 
     enum FLAGS{
-        DEFAULT,
+        DEFAULT = 0,
 
         PAWN_LONG_MOVE,
         EN_PASSANT_CAPTURE,

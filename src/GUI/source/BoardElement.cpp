@@ -42,6 +42,15 @@ void BoardElement::setFigureDisable()
     this->FigureDisable = true;
 }
 
+void BoardElement::setLetters(char Num, char let) {
+    if (Num != '\0') {
+        NumCRD = QString::fromLatin1(&Num, 1);
+    }
+    if (let != '\0') {
+        LetCRD = QString::fromLatin1(&let, 1);
+    }
+}
+
 uint8_t BoardElement::getSide() const
 {
     return this->side;
@@ -116,10 +125,12 @@ void BoardElement::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
 
 
     if (PossibleMove) {
-        painter->setBrush(QColor(16, 184, 251));
+        QColor color(Qt::blue);
+        color.setAlpha(64);
+        painter->setRenderHint(QPainter::Antialiasing);
+        painter->setBrush(color);
         QRectF rect = this->boundingRect();
         QPointF center = rect.center();
-        painter->setOpacity(0.8);
         painter->drawEllipse(center.x() - 7, center.y() - 6, 15,15);
     }
 }

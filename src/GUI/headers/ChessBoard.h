@@ -4,7 +4,6 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QPair>
-#include <QVector2D>
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QTransform>
@@ -13,6 +12,18 @@
 #include "BoardElement.h"
 #include "src/GameEngine/MoveGen/headers/LegalMoveGen.h"
 
+enum GameStatus {
+    DRAW = 0,
+
+    WHITE_TO_MOVE = 1,
+    BLACK_TO_MOVE = 2,
+
+    WHITE_WIN = 3,
+    BLACK_WIN = 4,
+
+    WHITE_CHECKED = 5,
+    BLACK_CHECKED = 6
+};
 
 class ChessBoard : public QGraphicsView{
     Q_OBJECT
@@ -21,12 +32,22 @@ public:
     void drawBoard();
     void addFigures();
     void MoveFigure(uint8_t from, uint8_t to);
+    void ChangeLetters(uint8_t Side_);
+
+    uint8_t getStatus();
+    bool isInsufficientMaterial();
+    bool isInCheck(uint8_t side_);
+    uint8_t getBlackStatus();
+    uint8_t getWhiteStatus();
 
     void setPosition(const Position& position_);
 
     void closeEvent(QCloseEvent* event)override;
 
     void ChangeSide(uint8_t Side_);
+    void TransformCoordinates(uint8_t& x, uint8_t& y);
+
+    uint8_t getPromotionChoice();
 
     static constexpr QSize size{600, 600};
 
@@ -43,6 +64,8 @@ public slots:
 
 signals:
     void UpdatePosition(const Position& position, uint8_t side);
+    void Moved();
+    void SentStatus(uint8_t status);
 
 
 private:

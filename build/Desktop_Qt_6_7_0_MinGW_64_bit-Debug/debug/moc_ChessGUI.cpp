@@ -36,15 +36,7 @@ namespace {
 #ifdef QT_MOC_HAS_STRINGDATA
 struct qt_meta_stringdata_CLASSChessGUIENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSChessGUIENDCLASS = QtMocHelpers::stringData(
-    "ChessGUI",
-    "PlayWithAI",
-    "",
-    "PlayWithFriend",
-    "SentPositionToOther",
-    "Position",
-    "position",
-    "uint8_t",
-    "FromWho"
+    "ChessGUI"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -57,22 +49,12 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSChessGUIENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       0,    0, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
        0,       // signalCount
-
- // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   32,    2, 0x0a,    1 /* Public */,
-       3,    0,   33,    2, 0x0a,    2 /* Public */,
-       4,    2,   34,    2, 0x0a,    3 /* Public */,
-
- // slots: parameters
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 5, 0x80000000 | 7,    6,    8,
 
        0        // eod
 };
@@ -85,31 +67,17 @@ Q_CONSTINIT const QMetaObject ChessGUI::staticMetaObject = { {
     nullptr,
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSChessGUIENDCLASS_t,
         // Q_OBJECT / Q_GADGET
-        QtPrivate::TypeAndForceComplete<ChessGUI, std::true_type>,
-        // method 'PlayWithAI'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'PlayWithFriend'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'SentPositionToOther'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<const Position &, std::false_type>,
-        QtPrivate::TypeAndForceComplete<uint8_t, std::false_type>
+        QtPrivate::TypeAndForceComplete<ChessGUI, std::true_type>
     >,
     nullptr
 } };
 
 void ChessGUI::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        auto *_t = static_cast<ChessGUI *>(_o);
-        (void)_t;
-        switch (_id) {
-        case 0: _t->PlayWithAI(); break;
-        case 1: _t->PlayWithFriend(); break;
-        case 2: _t->SentPositionToOther((*reinterpret_cast< std::add_pointer_t<Position>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[2]))); break;
-        default: ;
-        }
-    }
+    (void)_o;
+    (void)_id;
+    (void)_c;
+    (void)_a;
 }
 
 const QMetaObject *ChessGUI::metaObject() const
@@ -128,17 +96,6 @@ void *ChessGUI::qt_metacast(const char *_clname)
 int ChessGUI::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QMainWindow::qt_metacall(_c, _id, _a);
-    if (_id < 0)
-        return _id;
-    if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
-            qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
-    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 3)
-            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 3;
-    }
     return _id;
 }
 QT_WARNING_POP
