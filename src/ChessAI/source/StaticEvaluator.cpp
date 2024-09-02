@@ -1,6 +1,29 @@
 #include "src/ChessAI/headers/StaticEvaluator.h"
 
 
+int32_t StaticEvaluator::evaluate(Pieces pieces)
+{
+    int32_t evaluation = 0;
+
+    int32_t materialEvaluation = material(pieces);
+    int32_t mobilityEvaluation = mobility(pieces);
+    int32_t doublePawnEvaluation = doublePawn(pieces);
+    int32_t connectedPawnEvaluation = connectedPawn(pieces);
+    int32_t pawnPromotionEvaluation = pawnPromotion(pieces);
+    int32_t kingSafetyEvaluation = kingSafety(pieces);
+    int32_t endGameEvaluation = endgame(pieces, materialEvaluation >= 0);
+
+    evaluation += materialEvaluation;
+    evaluation += mobilityEvaluation;
+    evaluation += doublePawnEvaluation;
+    evaluation += connectedPawnEvaluation;
+    evaluation += pawnPromotionEvaluation;
+    evaluation += kingSafetyEvaluation;
+    evaluation += endGameEvaluation;
+
+    return evaluation;
+}
+
 int32_t StaticEvaluator::material(Pieces pieces)
 {
     int32_t material_ = 0;

@@ -9,6 +9,8 @@ ChessBoard::ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphi
     this->resize(ChessBoard::size);
     scene = new QGraphicsScene;
     CheckedSquare = nullptr;
+    IsWhiteMove = true;
+    choice = nullptr;
     this->drawBoard();
     this->addFigures();
     this->setScene(scene);
@@ -17,7 +19,7 @@ ChessBoard::ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphi
     this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
 
-void ChessBoard::drawBoard()
+void ChessBoard::drawBoard() noexcept
 {
     if(this->side == WHITE){
         for(uint8_t i = 0; i < 8; i ++){
@@ -60,7 +62,7 @@ void ChessBoard::drawBoard()
     }
 }
 
-void ChessBoard::addFigures()
+void ChessBoard::addFigures() noexcept
 {
     for(int32_t x = 0; x < 8; x++){
         for(int32_t y = 0; y < 8; y++){
@@ -71,14 +73,19 @@ void ChessBoard::addFigures()
                 continue;
             }
 
+
             Elements[x][y]->setFigure(SideName.first, SideName.second);
+            if(SideName.first != this->side)
+                Elements[x][y]->setFigureAble();
+            else
+                Elements[x][y]->setFigureDisable();
             Elements[x][y]->setPossible(false);
             Elements[x][y]->update();
         }
     }
 }
 
-void ChessBoard::MoveFigure(uint8_t from, uint8_t to)
+void ChessBoard::MoveFigure(uint8_t from, uint8_t to) noexcept
 {
 
     uint8_t x1 = from % 8;
@@ -117,7 +124,8 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to)
     emit SentStatus(status, FROM, TO, this->side);
 }
 
-void ChessBoard::ChangeLetters(uint8_t Side_) {
+void ChessBoard::ChangeLetters(uint8_t Side_) noexcept
+{
     if (Side_ == WHITE) {
         for (auto i = 0; i < 8; i++) {
             Elements[0][i]->setLetters('8' - i, '\0');
@@ -135,7 +143,7 @@ void ChessBoard::ChangeLetters(uint8_t Side_) {
     }
 }
 
-bool ChessBoard::isInsufficientMaterial()
+bool ChessBoard::isInsufficientMaterial() noexcept
 {
     return !this->position.getPieces().getPieceBitBoard(SIDE::WHITE, PIECE::PAWN) &&
             !this->position.getPieces().getPieceBitBoard(SIDE::BLACK, PIECE::PAWN) &&
@@ -150,7 +158,7 @@ bool ChessBoard::isInsufficientMaterial()
 
 }
 
-bool ChessBoard::isInCheck(uint8_t side_) {
+bool ChessBoard::isInCheck(uint8_t side_) noexcept {
     MoveList moves = LegalMoveGen::generate(this->position, side_);
     for (auto i = 0; i < moves.size(); i++){
         uint8_t x = moves[i].getTo() % 8;
@@ -165,7 +173,7 @@ bool ChessBoard::isInCheck(uint8_t side_) {
     }
     return false;
 }
-uint8_t ChessBoard::getBlackStatus() {
+uint8_t ChessBoard::getBlackStatus() noexcept {
     MoveList moves = LegalMoveGen::generate(this->position, WHITE);
     if (moves.size() == 0) {
         if (isInCheck(BLACK)) {
@@ -180,7 +188,7 @@ uint8_t ChessBoard::getBlackStatus() {
     }
 }
 
-uint8_t ChessBoard::getWhiteStatus() {
+uint8_t ChessBoard::getWhiteStatus()noexcept {
     MoveList moves = LegalMoveGen::generate(this->position, BLACK);
     if (moves.size() == 0) {
         if (isInCheck(WHITE)) {
@@ -195,12 +203,26 @@ uint8_t ChessBoard::getWhiteStatus() {
     }
 }
 
-const Position &ChessBoard::getPosition()
+uint8_t ChessBoard::getPromotionChoice() noexcept
+{
+    choice = new PromotionChoice(this->side);
+    choice->show();
+
+    QEventLoop loop;
+    QObject::connect(choice, &PromotionChoice::ChoiceMade, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    uint8_t Promotion = choice->getChoice();
+    choice->hide();
+    return Promotion;
+}
+
+const Position &ChessBoard::getPosition() const noexcept
 {
     return this->position;
 }
 
-void ChessBoard::setKingChecked(uint8_t side_)
+void ChessBoard::setKingChecked(uint8_t side_) noexcept
 {
     if(side_ == WHITE){
         for(auto i = 0; i < 8; i ++ ){
@@ -225,13 +247,13 @@ void ChessBoard::setKingChecked(uint8_t side_)
     }
 }
 
-void ChessBoard::deleteCheck()
+void ChessBoard::deleteCheck() noexcept
 {
     if(CheckedSquare != nullptr)
         CheckedSquare->setChecked(false);
 }
 
-uint8_t ChessBoard::getStatus()
+uint8_t ChessBoard::getStatus() noexcept
 {
     if(this->position.fiftyMovesRuleDraw() || this->position.threefoldRepetitionDraw()){
         return GameStatus::DRAW;
@@ -247,7 +269,7 @@ uint8_t ChessBoard::getStatus()
     }
 }
 
-void ChessBoard::setPosition(const Position &position_)
+void ChessBoard::setPosition(const Position &position_) noexcept
 {
     this->position = position_;
     this->addFigures();
@@ -270,25 +292,21 @@ void ChessBoard::closeEvent(QCloseEvent *event)
     }
 }
 
-void ChessBoard::ChangeSide(uint8_t Side_)
+void ChessBoard::ChangeSide(uint8_t Side_) noexcept
 {
     this->side = this->side == WHITE? BLACK : WHITE;
     this->ChangeLetters(this->side);
     this->addFigures();
 }
 
-void ChessBoard::TransformCoordinates(uint8_t &x, uint8_t &y)
+void ChessBoard::TransformCoordinates(uint8_t &x, uint8_t &y) noexcept
 {
     x = 7- x;
     y = 7 - y;
 }
 
-uint8_t ChessBoard::getPromotionChoice()
-{
 
-}
-
-QPair<uint8_t, uint8_t> ChessBoard::getTextureName(int32_t x, int32_t y)
+QPair<uint8_t, uint8_t> ChessBoard::getTextureName(int32_t x, int32_t y) const noexcept
 {
     std::array<std::array<BitBoard, 6>, 2> bs = this->position.getPieces().getPieceBitBoards();
     int32_t id = y * 8 + x;
@@ -336,18 +354,18 @@ QPair<uint8_t, uint8_t> ChessBoard::getTextureName(int32_t x, int32_t y)
     return QPair<uint8_t, uint8_t>(Position::NONE, Position::NONE);
 }
 
-QPair<uint8_t, uint8_t> ChessBoard::BlackToWhiteTransform(QPair<uint8_t, uint8_t> pair)
+QPair<uint8_t, uint8_t> ChessBoard::BlackToWhiteTransform(QPair<uint8_t, uint8_t> pair) noexcept
 {
     uint8_t side_ = pair.first == WHITE ? BLACK : WHITE;
     return QPair<uint8_t, uint8_t>(side_, pair.second);
 }
 
-uint8_t ChessBoard::BlackWhiteReverse(uint8_t side)
+uint8_t ChessBoard::BlackWhiteReverse(uint8_t side) noexcept
 {
     return side == WHITE ? BLACK : WHITE;
 }
 
-uint8_t ChessBoard::getFlagOfMove(uint8_t from, uint8_t to)
+uint8_t ChessBoard::getFlagOfMove(uint8_t from, uint8_t to) noexcept
 {
     uint8_t x1 = from % 8;
     uint8_t y1 = from / 8;

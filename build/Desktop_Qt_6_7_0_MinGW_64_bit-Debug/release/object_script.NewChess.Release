@@ -1,11 +1,14 @@
+release/AI.o
 release/Entry.o
 release/MoveSorter.o
 release/OpeningBook.o
+release/SearchInterrupter.o
 release/StaticEvaluator.o
 release/TranspositionTable.o
 release/BoardElement.o
 release/ChessBoard.o
 release/ChessGUI.o
+release/PromotionChoice.o
 release/tester.o
 release/LegalMoveGen.o
 release/MoveList.o
@@ -20,3 +23,4 @@ release/qrc_res.o
 release/moc_BoardElement.o
 release/moc_ChessBoard.o
 release/moc_ChessGUI.o
+release/moc_PromotionChoice.o

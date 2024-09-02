@@ -9,8 +9,10 @@
 #include <QTransform>
 #include <QGraphicsProxyWidget>
 #include <QObject>
+#include <QEventLoop>
 #include "BoardElement.h"
 #include "src/GameEngine/MoveGen/headers/LegalMoveGen.h"
+#include "PromotionChoice.h"
 
 enum GameStatus {
     DRAW = 0,
@@ -28,40 +30,35 @@ enum GameStatus {
 class ChessBoard : public QGraphicsView{
     Q_OBJECT
 public:
-    ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphicsView* parent = nullptr);
-    void drawBoard();
-    void addFigures();
-    void MoveFigure(uint8_t from, uint8_t to);
-    void ChangeLetters(uint8_t Side_);
+    explicit ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphicsView* parent = nullptr);
 
-    uint8_t getStatus();
-    bool isInsufficientMaterial();
-    bool isInCheck(uint8_t side_);
-    uint8_t getBlackStatus();
-    uint8_t getWhiteStatus();
-
-    const Position &getPosition();
-
-    void setKingChecked(uint8_t side_);
-    void deleteCheck();
-
-    void setPosition(const Position& position_);
-
+    void drawBoard() noexcept;
+    void addFigures() noexcept;
+    void MoveFigure(uint8_t from, uint8_t to) noexcept;
+    void ChangeLetters(uint8_t Side_) noexcept;
+    void setKingChecked(uint8_t side_) noexcept;
+    void deleteCheck() noexcept;
+    void setPosition(const Position& position_) noexcept;
     void closeEvent(QCloseEvent* event)override;
+    void ChangeSide(uint8_t Side_) noexcept;
+    void TransformCoordinates(uint8_t& x, uint8_t& y) noexcept;
 
-    void ChangeSide(uint8_t Side_);
-    void TransformCoordinates(uint8_t& x, uint8_t& y);
+    [[nodiscard]] uint8_t getStatus() noexcept;
+    [[nodiscard]] uint8_t getBlackStatus()  noexcept;
+    [[nodiscard]] uint8_t getWhiteStatus() noexcept;
+    [[nodiscard]] uint8_t getPromotionChoice() noexcept;
+    [[nodiscard]] uint8_t BlackWhiteReverse(uint8_t side) noexcept;
+    [[nodiscard]] uint8_t getFlagOfMove(uint8_t from, uint8_t to) noexcept;
 
-    uint8_t getPromotionChoice();
+    bool isInsufficientMaterial() noexcept;
+    bool isInCheck(uint8_t side_) noexcept;
+
+    QPair<uint8_t, uint8_t> getTextureName(int32_t x, int32_t y) const noexcept;
+    QPair<uint8_t, uint8_t> BlackToWhiteTransform(QPair<uint8_t, uint8_t> pair) noexcept;
+
+    const Position &getPosition() const noexcept;
 
     static constexpr QSize size{600, 600};
-
-    QPair<uint8_t, uint8_t> getTextureName(int32_t x, int32_t y);
-    QPair<uint8_t, uint8_t> BlackToWhiteTransform(QPair<uint8_t, uint8_t> pair);
-
-    uint8_t BlackWhiteReverse(uint8_t side);
-
-    uint8_t getFlagOfMove(uint8_t from, uint8_t to) ;
 
 public slots:
     void getFigurePrepared(QPair<uint8_t, uint8_t> figure);
@@ -77,6 +74,7 @@ private:
     QGraphicsScene* scene;
     std::array<std::array<BoardElement*, 8>, 8> Elements;
     BoardElement* CheckedSquare;
+    PromotionChoice* choice;
 
     QPair<uint8_t, uint8_t> buffer;
     std::list<uint8_t> LastPossibleMoves;
@@ -84,6 +82,7 @@ private:
     uint8_t side;
 
     bool IsFigureChosen;
+    bool IsWhiteMove;
 };
 
 #endif // CHESSBOARD_H

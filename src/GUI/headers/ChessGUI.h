@@ -9,22 +9,29 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QString>
+#include "src/ChessAI/headers/AI.h"
 #include "src/GUI/headers/ChessBoard.h"
 #include <memory>
+
+enum class StyleOfGame: uint8_t{
+    PLAY_WITH_AI,
+    PLAY_WITH_FRIEND
+};
 
 class ChessGUI : public QMainWindow{
     Q_OBJECT
 public:
-    ChessGUI(QMainWindow* parent = nullptr);
+    ChessGUI(StyleOfGame style, QMainWindow* parent = nullptr);
+    ~ChessGUI() = default;
 
 public slots:
     void SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side);
 
 private:
     void init();
-    void makeConnections();
-    void addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_);
-    void addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t statusOfGame);
+    void makeConnections() noexcept;
+    void addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_) noexcept;
+    void addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t statusOfGame) noexcept;
 
 
 

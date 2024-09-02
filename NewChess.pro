@@ -9,14 +9,17 @@ CONFIG += c++20
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    src/ChessAI/source/AI.cpp \
     src/ChessAI/source/Entry.cpp \
     src/ChessAI/source/MoveSorter.cpp \
     src/ChessAI/source/OpeningBook.cpp \
+    src/ChessAI/source/SearchInterrupter.cpp \
     src/ChessAI/source/StaticEvaluator.cpp \
     src/ChessAI/source/TranspositionTable.cpp \
     src/GUI/source/BoardElement.cpp \
     src/GUI/source/ChessBoard.cpp \
     src/GUI/source/ChessGUI.cpp \
+    src/GUI/source/PromotionChoice.cpp \
     src/GameEngine/MoveGen/headers/tester.cpp \
     src/GameEngine/MoveGen/source/LegalMoveGen.cpp \
     src/GameEngine/MoveGen/source/MoveList.cpp \
@@ -29,15 +32,18 @@ SOURCES += \
     src/main.cpp
 
 HEADERS += \
+    src/ChessAI/headers/AI.h \
     src/ChessAI/headers/Entry.h \
     src/ChessAI/headers/MoveSorter.h \
     src/ChessAI/headers/OpeningBook.h \
     src/ChessAI/headers/PassedPawnMasks.h \
+    src/ChessAI/headers/SearchInterrupter.h \
     src/ChessAI/headers/StaticEvaluator.h \
     src/ChessAI/headers/TranspositionTable.h \
     src/GUI/headers/BoardElement.h \
     src/GUI/headers/ChessBoard.h \
     src/GUI/headers/ChessGUI.h \
+    src/GUI/headers/PromotionChoice.h \
     src/GameEngine/MoveGen/headers/KingMasks.h \
     src/GameEngine/MoveGen/headers/KnightMask.h \
     src/GameEngine/MoveGen/headers/LegalMoveGen.h \

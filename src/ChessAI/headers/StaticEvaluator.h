@@ -6,6 +6,7 @@
 
 class StaticEvaluator{
 public:
+    static int32_t evaluate(Pieces pieces);
 
 private:
     static int32_t material(Pieces pieces);

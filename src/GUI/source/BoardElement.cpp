@@ -25,25 +25,30 @@ BoardElement::~BoardElement()
 
 }
 
-void BoardElement::setFigure(uint8_t side_, uint8_t piece_)
+void BoardElement::setFigure(uint8_t side_, uint8_t piece_) noexcept
 {
     this->side = side_;
     this->piece = piece_;
     this->update();
 }
 
-void BoardElement::setPossible(bool isPossible)
+void BoardElement::setPossible(bool isPossible) noexcept
 {
     this->PossibleMove = isPossible;
     update();
 }
 
-void BoardElement::setFigureDisable()
+void BoardElement::setFigureDisable() noexcept
 {
     this->FigureDisable = true;
 }
 
-void BoardElement::setLetters(char Num, char let) {
+void BoardElement::setFigureAble() noexcept
+{
+    this->FigureDisable = false;
+}
+
+void BoardElement::setLetters(char Num, char let) noexcept {
     if (Num != '\0') {
         NumCRD = QString::fromLatin1(&Num, 1);
     }
@@ -52,7 +57,7 @@ void BoardElement::setLetters(char Num, char let) {
     }
 }
 
-void BoardElement::setChecked(bool checked)
+void BoardElement::setChecked(bool checked) noexcept
 {
     this->isChecked = checked;
     this->update();

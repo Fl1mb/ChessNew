@@ -1,21 +1,36 @@
 #include "src/ChessAI/headers/TranspositionTable.h"
 
 
+TranspositionTable* TranspositionTable::table = nullptr;
 
 TranspositionTable::TranspositionTable() = default;
-void TranspositionTable::addEntry(const Entry &entry)
+TranspositionTable *TranspositionTable::getPtr()
 {
-    auto hash_copy = this->_set.find(entry);
-    if(hash_copy == this->_set.end() or hash_copy->depth_ < entry.depth_)
-        this->_set.insert(entry);
+    if(table == nullptr){
+        table = new TranspositionTable();
+    }
+    return table;
+}
+
+void TranspositionTable::addEntry(ZobristHash hash, int32_t depth, uint8_t bestMoveIndex)
+{
+    auto it = this->map.find(hash.getValue());
+    if (it == this->map.end()) {
+        this->map[hash.getValue()] = std::make_pair(depth, bestMoveIndex);
+    }
+    else if (it->second.first < depth) {
+        this->map.erase(it);
+        this->map[hash.getValue()] = std::make_pair(depth, bestMoveIndex);
+    }
 }
 
 TranspositionTable::tryToFindBestMoveIndex(ZobristHash hash_)
 {
-    auto entry = this->_set.find({hash_, 0, 0});
-
-    if(entry == this->_set.end()) return NONE;
-    return entry->best_move_index_;
+    auto it = this->map.find(hash_.getValue());
+    if (it == this->map.end()) {
+        return NONE;
+    }
+    return it->second.second;
 }
 
 

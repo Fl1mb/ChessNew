@@ -26,11 +26,12 @@ public:
     BoardElement(ColorOfSquare color_ ,qreal x_, qreal y_, uint8_t vert, uint8_t goriz,char num, char let, QObject* parent = nullptr);
     virtual ~BoardElement() override;
 
-    void setFigure(uint8_t side_, uint8_t piece_);
-    void setPossible(bool isPossible);
-    void setFigureDisable();
-    void setLetters(char Num, char let);
-    void setChecked(bool checked);
+    void setFigure(uint8_t side_, uint8_t piece_) noexcept;
+    void setPossible(bool isPossible) noexcept;
+    void setFigureDisable() noexcept;
+    void setFigureAble() noexcept;
+    void setLetters(char Num, char let) noexcept;
+    void setChecked(bool checked) noexcept;
 
     uint8_t getSide()const;
     uint8_t getPiece() const;
@@ -38,8 +39,8 @@ public:
 
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
-
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+
     int type()const override;
     void advance(int phase) override;
     QPainterPath shape() const override;

@@ -1,12 +1,13 @@
 #include "src/GUI/headers/ChessGUI.h"
 
 
-ChessGUI::ChessGUI(QMainWindow *parent) : QMainWindow(parent)
+ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent)
 {
     init();
     makeConnections();
 
 }
+
 
 void ChessGUI::SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side)
 {
@@ -81,13 +82,13 @@ void ChessGUI::init()
     this->show();
 }
 
-void ChessGUI::makeConnections()
+void ChessGUI::makeConnections() noexcept
 {
     QObject::connect(Board.get(), &ChessBoard::Moved, Board.get(), [&](){Board->ChangeSide(BLACK);});
     QObject::connect(Board.get(), &ChessBoard::SentStatus, this, &ChessGUI::SetStatus);
 }
 
-void ChessGUI::addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_)
+void ChessGUI::addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_) noexcept
 {
     uint8_t x1 = from.first;
     uint8_t y1 = from.second;
@@ -118,7 +119,8 @@ void ChessGUI::addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8
 }
 
 
-void ChessGUI::addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t statusOfGame){
+void ChessGUI::addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t statusOfGame) noexcept
+{
     uint8_t x1 = from.first;
     uint8_t y1 = from.second;
 

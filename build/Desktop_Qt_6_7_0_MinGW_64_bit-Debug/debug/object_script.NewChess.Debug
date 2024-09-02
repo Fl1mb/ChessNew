@@ -1,11 +1,14 @@
+debug/AI.o
 debug/Entry.o
 debug/MoveSorter.o
 debug/OpeningBook.o
+debug/SearchInterrupter.o
 debug/StaticEvaluator.o
 debug/TranspositionTable.o
 debug/BoardElement.o
 debug/ChessBoard.o
 debug/ChessGUI.o
+debug/PromotionChoice.o
 debug/tester.o
 debug/LegalMoveGen.o
 debug/MoveList.o
@@ -20,3 +23,4 @@ debug/qrc_res.o
 debug/moc_BoardElement.o
 debug/moc_ChessBoard.o
 debug/moc_ChessGUI.o
+debug/moc_PromotionChoice.o
