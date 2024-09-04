@@ -11,7 +11,7 @@ public:
     OpeningBook();
     OpeningBook(const std::string& path);
 
-    std::tuple<Move, int32_t> TryToFindMove(const Position& position);
+    std::tuple<int32_t, bool, Move> TryToFindMove(const Position& position);
 
 private:
     std::vector<std::vector<Move>> moves_;

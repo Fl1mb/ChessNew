@@ -3,8 +3,8 @@
 
 ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent)
 {
-    init();
-    makeConnections();
+    AI::setOpeningBook(":/openingBook/data/openingBook.txt");
+    this->StartGameWithAI(WHITE);
 
 }
 
@@ -115,6 +115,48 @@ void ChessGUI::addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8
         TableOfTurns->setItem(row - 1, 1, item);
     }
 
+
+}
+
+void ChessGUI::StartGameWithAI(uint8_t SideOfAI)
+{
+    if(SideOfAI == WHITE){
+        Board = std::make_unique<ChessBoard>(WHITE, this->StartPosition);
+        Board->setMinimumSize(ChessBoard::size);
+
+        CentralWidget = std::make_unique<QWidget>();
+        VerticalLayout = std::make_unique<QVBoxLayout>();
+        BoardAndTable = std::make_unique<QWidget>();
+        LayoutForBoard = std::make_unique<QHBoxLayout>();
+
+        TurnLable = std::make_unique<QLabel>("<b>История ходов<b>");
+        TurnLable->setAlignment(Qt::AlignCenter);
+
+        TableOfTurns = std::make_unique<QTableWidget>();
+        TableOfTurns->setColumnCount(2);
+        TableOfTurns->setHorizontalHeaderLabels({"Ход белых", "Ход черных"});
+        TableOfTurns->setFixedWidth(210);
+        TableOfTurns->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+        TurnWidget = std::make_unique<QWidget>();
+        TurnLayout = std::make_unique<QVBoxLayout>();
+
+        TurnLayout->addWidget(TurnLable.get());
+        TurnLayout->addWidget(TableOfTurns.get());
+        TurnWidget->setLayout(TurnLayout.get());
+
+        LayoutForBoard->addWidget(Board.get());
+        LayoutForBoard->addWidget(TurnWidget.get());
+        BoardAndTable->setLayout(LayoutForBoard.get());
+
+        VerticalLayout->addWidget(BoardAndTable.get());
+        CentralWidget->setLayout(VerticalLayout.get());
+
+
+        this->setCentralWidget(CentralWidget.get());
+    }
+    QObject::connect(Board.get(), &ChessBoard::Moved, Board.get(), &ChessBoard::makeAIMove);
+    QObject::connect(Board.get(), &ChessBoard::SentStatus, this , &ChessGUI::SetStatus);
 
 }
 

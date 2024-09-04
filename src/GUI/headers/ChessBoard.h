@@ -6,10 +6,12 @@
 #include <QPair>
 #include <QCloseEvent>
 #include <QMessageBox>
+#include <chrono>
 #include <QTransform>
 #include <QGraphicsProxyWidget>
 #include <QObject>
 #include <QEventLoop>
+#include "src/ChessAI/headers/AI.h"
 #include "BoardElement.h"
 #include "src/GameEngine/MoveGen/headers/LegalMoveGen.h"
 #include "PromotionChoice.h"
@@ -42,6 +44,7 @@ public:
     void closeEvent(QCloseEvent* event)override;
     void ChangeSide(uint8_t Side_) noexcept;
     void TransformCoordinates(uint8_t& x, uint8_t& y) noexcept;
+    void TurnOnAI(uint8_t sideOfAI) noexcept;
 
     [[nodiscard]] uint8_t getStatus() noexcept;
     [[nodiscard]] uint8_t getBlackStatus()  noexcept;
@@ -63,6 +66,7 @@ public:
 public slots:
     void getFigurePrepared(QPair<uint8_t, uint8_t> figure);
     void getFigureMoved(QPair<uint8_t, uint8_t> to);
+    void makeAIMove();
 
 signals:
     void UpdatePosition(const Position& position, uint8_t side);
@@ -73,6 +77,7 @@ signals:
 private:
     QGraphicsScene* scene;
     std::array<std::array<BoardElement*, 8>, 8> Elements;
+    AI* ai;
     BoardElement* CheckedSquare;
     PromotionChoice* choice;
 
@@ -80,6 +85,7 @@ private:
     std::list<uint8_t> LastPossibleMoves;
     Position position;
     uint8_t side;
+    uint8_t SideOfAI;
 
     bool IsFigureChosen;
     bool IsWhiteMove;

@@ -53,7 +53,7 @@ OpeningBook::OpeningBook(const std::string &path)
     file.close();
 }
 
-std::tuple<Move, int32_t> OpeningBook::TryToFindMove(const Position &position)
+std::tuple<int32_t, bool, Move> OpeningBook::TryToFindMove(const Position &position)
 {
     Position buff;
     std::vector<Move> possible_moves;
@@ -93,8 +93,8 @@ std::tuple<Move, int32_t> OpeningBook::TryToFindMove(const Position &position)
     }
 
     if(possible_moves.empty()){
-        return std::make_tuple(Move(), 0);
+        return std::make_tuple(0, false, Move());
     }
 
-    return std::make_tuple(possible_moves[time(nullptr) % possible_moves.size()], possible_moves.size());
+    return std::make_tuple(possible_moves.size(), true, possible_moves[time(nullptr) % possible_moves.size()] );
 }

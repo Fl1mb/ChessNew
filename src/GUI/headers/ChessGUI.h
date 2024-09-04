@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QTableWidget>
 #include <QString>
-#include "src/ChessAI/headers/AI.h"
+
 #include "src/GUI/headers/ChessBoard.h"
 #include <memory>
 
@@ -31,6 +31,7 @@ private:
     void init();
     void makeConnections() noexcept;
     void addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_) noexcept;
+    void StartGameWithAI(uint8_t SideOfAI);
     void addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t statusOfGame) noexcept;
 
 

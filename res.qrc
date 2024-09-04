@@ -13,4 +13,7 @@
         <file>data/images/WhiteQueen.png</file>
         <file>data/images/WhiteRook.png</file>
     </qresource>
+    <qresource prefix="/openingBook">
+        <file>data/openingBook.txt</file>
+    </qresource>
 </RCC>

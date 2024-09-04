@@ -20,6 +20,7 @@ enum SIDE{
 class Pieces{
 public:
     Pieces();
+    Pieces(const Pieces& other) = default;
     Pieces(const std::string &shortFen, bool Flag = false);
 
     friend std::ostream &operator<<(std::ostream& ostream, Pieces pieces);

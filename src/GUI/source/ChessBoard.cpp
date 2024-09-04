@@ -103,8 +103,7 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to) noexcept
 
 
     this->position.move(Move(from, to, Elements[x1][y1]->getPiece(), Elements[x1][y1]->getSide(),Elements[x2][y2]->getPiece(), Elements[x2][y2]->getSide(), flag));
-    Elements[x2][y2]->setFigure(Elements[x1][y1]->getSide(), Elements[x1][y1]->getPiece());
-    Elements[x1][y1]->setFigure(Move::NONE, Move::NONE);
+    this->addFigures();
 
     uint8_t status = getStatus();
     for(auto i = 0; i  < 8; i ++){
@@ -113,9 +112,6 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to) noexcept
             Elements[i][j]->update();
         }
     }
-
-    Elements[x2][y2]->update();
-    Elements[x1][y1]->update();
 
     IsFigureChosen = false;
     QPair<uint8_t, uint8_t> FROM = Elements[x1][y1]->getCoordinates();
@@ -305,6 +301,11 @@ void ChessBoard::TransformCoordinates(uint8_t &x, uint8_t &y) noexcept
     y = 7 - y;
 }
 
+void ChessBoard::TurnOnAI(uint8_t sideOfAi) noexcept
+{
+    this->SideOfAI = sideOfAi;
+}
+
 
 QPair<uint8_t, uint8_t> ChessBoard::getTextureName(int32_t x, int32_t y) const noexcept
 {
@@ -453,6 +454,15 @@ void ChessBoard::getFigureMoved(QPair<uint8_t, uint8_t> to)
     uint8_t To = to.first * 8 + to.second;
 
     this->MoveFigure(from, To);
+}
+
+void ChessBoard::makeAIMove()
+{
+    Move move = AI::getBestMove(this->position, WHITE, 100);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    this->position.move(move);
+    this->addFigures();
 }
 
 

@@ -203,7 +203,8 @@ release/qrc_res.cpp: ../../res.qrc \
 		../../data/images/BlackRook.png \
 		../../data/images/BlackKnight.png \
 		../../data/images/WhiteRook.png \
-		../../data/images/WhiteBishop.png
+		../../data/images/WhiteBishop.png \
+		../../data/openingBook.txt
 	C:\Qt\6.7.0\mingw_64\bin\rcc.exe -name res --no-zstd ..\..\res.qrc -o release\qrc_res.cpp
 
 compiler_moc_predefs_make_all: release/moc_predefs.h
@@ -591,6 +592,27 @@ release/moc_ChessBoard.cpp: ../../src/GUI/headers/ChessBoard.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicsitem.h \
 		../../../6.7.0/mingw_64/include/QtGui/qpainterpath.h \
 		../../../6.7.0/mingw_64/include/QtCore/QEventLoop \
+		../../src/ChessAI/headers/AI.h \
+		../../src/GameEngine/MoveGen/headers/LegalMoveGen.h \
+		../../src/GameEngine/MoveGen/headers/MoveList.h \
+		../../src/GameEngine/PosRep/headers/Move.h \
+		../../src/GameEngine/PosRep/headers/Pieces.h \
+		../../src/GameEngine/PosRep/headers/BitBoard.h \
+		../../src/GameEngine/MoveGen/headers/PsLegalMoveGen.h \
+		../../src/GameEngine/MoveGen/headers/KnightMask.h \
+		../../src/GameEngine/MoveGen/headers/KingMasks.h \
+		../../src/GameEngine/MoveGen/headers/SliderMasks.h \
+		../../src/GameEngine/PosRep/headers/Position.h \
+		../../src/GameEngine/PosRep/headers/RepetitionHistory.h \
+		../../src/GameEngine/PosRep/headers/ZobristHash.h \
+		../../src/GameEngine/PosRep/headers/ZobristHashConstants.h \
+		../../src/ChessAI/headers/MoveSorter.h \
+		../../src/ChessAI/headers/StaticEvaluator.h \
+		../../src/ChessAI/headers/PassedPawnMasks.h \
+		../../src/ChessAI/headers/TranspositionTable.h \
+		../../src/ChessAI/headers/Entry.h \
+		../../src/ChessAI/headers/OpeningBook.h \
+		../../src/ChessAI/headers/SearchInterrupter.h \
 		../../src/GUI/headers/BoardElement.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsItem \
 		../../../6.7.0/mingw_64/include/QtCore/QString \
@@ -600,19 +622,6 @@ release/moc_ChessBoard.cpp: ../../src/GUI/headers/ChessBoard.h \
 		../../../6.7.0/mingw_64/include/QtCore/QDebug \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsSceneMouseEvent \
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicssceneevent.h \
-		../../src/GameEngine/PosRep/headers/Position.h \
-		../../src/GameEngine/PosRep/headers/RepetitionHistory.h \
-		../../src/GameEngine/PosRep/headers/ZobristHash.h \
-		../../src/GameEngine/PosRep/headers/Pieces.h \
-		../../src/GameEngine/PosRep/headers/BitBoard.h \
-		../../src/GameEngine/PosRep/headers/ZobristHashConstants.h \
-		../../src/GameEngine/PosRep/headers/Move.h \
-		../../src/GameEngine/MoveGen/headers/LegalMoveGen.h \
-		../../src/GameEngine/MoveGen/headers/MoveList.h \
-		../../src/GameEngine/MoveGen/headers/PsLegalMoveGen.h \
-		../../src/GameEngine/MoveGen/headers/KnightMask.h \
-		../../src/GameEngine/MoveGen/headers/KingMasks.h \
-		../../src/GameEngine/MoveGen/headers/SliderMasks.h \
 		../../src/GUI/headers/PromotionChoice.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QWidget \
 		../../../6.7.0/mingw_64/include/QtWidgets/QPushButton \
@@ -883,6 +892,14 @@ release/moc_ChessGUI.cpp: ../../src/GUI/headers/ChessGUI.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicsitem.h \
 		../../../6.7.0/mingw_64/include/QtGui/qpainterpath.h \
 		../../../6.7.0/mingw_64/include/QtCore/QEventLoop \
+		../../src/ChessAI/headers/AI.h \
+		../../src/ChessAI/headers/MoveSorter.h \
+		../../src/ChessAI/headers/StaticEvaluator.h \
+		../../src/ChessAI/headers/PassedPawnMasks.h \
+		../../src/ChessAI/headers/TranspositionTable.h \
+		../../src/ChessAI/headers/Entry.h \
+		../../src/ChessAI/headers/OpeningBook.h \
+		../../src/ChessAI/headers/SearchInterrupter.h \
 		../../src/GUI/headers/BoardElement.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsItem \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsTextItem \
@@ -1584,6 +1601,27 @@ release/ChessBoard.o: ../../src/GUI/source/ChessBoard.cpp ../../src/GUI/headers/
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicsitem.h \
 		../../../6.7.0/mingw_64/include/QtGui/qpainterpath.h \
 		../../../6.7.0/mingw_64/include/QtCore/QEventLoop \
+		../../src/ChessAI/headers/AI.h \
+		../../src/GameEngine/MoveGen/headers/LegalMoveGen.h \
+		../../src/GameEngine/MoveGen/headers/MoveList.h \
+		../../src/GameEngine/PosRep/headers/Move.h \
+		../../src/GameEngine/PosRep/headers/Pieces.h \
+		../../src/GameEngine/PosRep/headers/BitBoard.h \
+		../../src/GameEngine/MoveGen/headers/PsLegalMoveGen.h \
+		../../src/GameEngine/MoveGen/headers/KnightMask.h \
+		../../src/GameEngine/MoveGen/headers/KingMasks.h \
+		../../src/GameEngine/MoveGen/headers/SliderMasks.h \
+		../../src/GameEngine/PosRep/headers/Position.h \
+		../../src/GameEngine/PosRep/headers/RepetitionHistory.h \
+		../../src/GameEngine/PosRep/headers/ZobristHash.h \
+		../../src/GameEngine/PosRep/headers/ZobristHashConstants.h \
+		../../src/ChessAI/headers/MoveSorter.h \
+		../../src/ChessAI/headers/StaticEvaluator.h \
+		../../src/ChessAI/headers/PassedPawnMasks.h \
+		../../src/ChessAI/headers/TranspositionTable.h \
+		../../src/ChessAI/headers/Entry.h \
+		../../src/ChessAI/headers/OpeningBook.h \
+		../../src/ChessAI/headers/SearchInterrupter.h \
 		../../src/GUI/headers/BoardElement.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsItem \
 		../../../6.7.0/mingw_64/include/QtCore/QString \
@@ -1593,19 +1631,6 @@ release/ChessBoard.o: ../../src/GUI/source/ChessBoard.cpp ../../src/GUI/headers/
 		../../../6.7.0/mingw_64/include/QtCore/QDebug \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsSceneMouseEvent \
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicssceneevent.h \
-		../../src/GameEngine/PosRep/headers/Position.h \
-		../../src/GameEngine/PosRep/headers/RepetitionHistory.h \
-		../../src/GameEngine/PosRep/headers/ZobristHash.h \
-		../../src/GameEngine/PosRep/headers/Pieces.h \
-		../../src/GameEngine/PosRep/headers/BitBoard.h \
-		../../src/GameEngine/PosRep/headers/ZobristHashConstants.h \
-		../../src/GameEngine/PosRep/headers/Move.h \
-		../../src/GameEngine/MoveGen/headers/LegalMoveGen.h \
-		../../src/GameEngine/MoveGen/headers/MoveList.h \
-		../../src/GameEngine/MoveGen/headers/PsLegalMoveGen.h \
-		../../src/GameEngine/MoveGen/headers/KnightMask.h \
-		../../src/GameEngine/MoveGen/headers/KingMasks.h \
-		../../src/GameEngine/MoveGen/headers/SliderMasks.h \
 		../../src/GUI/headers/PromotionChoice.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QWidget \
 		../../../6.7.0/mingw_64/include/QtWidgets/QPushButton \
@@ -1874,6 +1899,14 @@ release/ChessGUI.o: ../../src/GUI/source/ChessGUI.cpp ../../src/GUI/headers/Ches
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicsitem.h \
 		../../../6.7.0/mingw_64/include/QtGui/qpainterpath.h \
 		../../../6.7.0/mingw_64/include/QtCore/QEventLoop \
+		../../src/ChessAI/headers/AI.h \
+		../../src/ChessAI/headers/MoveSorter.h \
+		../../src/ChessAI/headers/StaticEvaluator.h \
+		../../src/ChessAI/headers/PassedPawnMasks.h \
+		../../src/ChessAI/headers/TranspositionTable.h \
+		../../src/ChessAI/headers/Entry.h \
+		../../src/ChessAI/headers/OpeningBook.h \
+		../../src/ChessAI/headers/SearchInterrupter.h \
 		../../src/GUI/headers/BoardElement.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsItem \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsTextItem \
@@ -2427,6 +2460,14 @@ release/main.o: ../../src/main.cpp ../../../6.7.0/mingw_64/include/QtWidgets/QAp
 		../../../6.7.0/mingw_64/include/QtWidgets/qgraphicsitem.h \
 		../../../6.7.0/mingw_64/include/QtGui/qpainterpath.h \
 		../../../6.7.0/mingw_64/include/QtCore/QEventLoop \
+		../../src/ChessAI/headers/AI.h \
+		../../src/ChessAI/headers/MoveSorter.h \
+		../../src/ChessAI/headers/StaticEvaluator.h \
+		../../src/ChessAI/headers/PassedPawnMasks.h \
+		../../src/ChessAI/headers/TranspositionTable.h \
+		../../src/ChessAI/headers/Entry.h \
+		../../src/ChessAI/headers/OpeningBook.h \
+		../../src/ChessAI/headers/SearchInterrupter.h \
 		../../src/GUI/headers/BoardElement.h \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsItem \
 		../../../6.7.0/mingw_64/include/QtWidgets/QGraphicsTextItem \

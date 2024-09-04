@@ -52,7 +52,8 @@ constexpr auto qt_meta_stringdata_CLASSChessBoardENDCLASS = QtMocHelpers::string
     "getFigurePrepared",
     "figure",
     "getFigureMoved",
-    "to"
+    "to",
+    "makeAIMove"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -65,7 +66,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSChessBoardENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       6,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -73,13 +74,14 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSChessBoardENDCLASS[] = {
        3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    2,   44,    2, 0x06,    1 /* Public */,
-       7,    0,   49,    2, 0x06,    4 /* Public */,
-       8,    4,   50,    2, 0x06,    5 /* Public */,
+       1,    2,   50,    2, 0x06,    1 /* Public */,
+       7,    0,   55,    2, 0x06,    4 /* Public */,
+       8,    4,   56,    2, 0x06,    5 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-      14,    1,   59,    2, 0x0a,   10 /* Public */,
-      16,    1,   62,    2, 0x0a,   12 /* Public */,
+      14,    1,   65,    2, 0x0a,   10 /* Public */,
+      16,    1,   68,    2, 0x0a,   12 /* Public */,
+      18,    0,   71,    2, 0x0a,   14 /* Public */,
 
  // signals: parameters
     QMetaType::Void, 0x80000000 | 3, 0x80000000 | 5,    4,    6,
@@ -89,6 +91,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSChessBoardENDCLASS[] = {
  // slots: parameters
     QMetaType::Void, 0x80000000 | 10,   15,
     QMetaType::Void, 0x80000000 | 10,   17,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -119,7 +122,9 @@ Q_CONSTINIT const QMetaObject ChessBoard::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<QPair<uint8_t,uint8_t>, std::false_type>,
         // method 'getFigureMoved'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QPair<uint8_t,uint8_t>, std::false_type>
+        QtPrivate::TypeAndForceComplete<QPair<uint8_t,uint8_t>, std::false_type>,
+        // method 'makeAIMove'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
     nullptr
 } };
@@ -135,6 +140,7 @@ void ChessBoard::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 2: _t->SentStatus((*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<uint8_t>>(_a[4]))); break;
         case 3: _t->getFigurePrepared((*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[1]))); break;
         case 4: _t->getFigureMoved((*reinterpret_cast< std::add_pointer_t<std::pair<uint8_t,uint8_t>>>(_a[1]))); break;
+        case 5: _t->makeAIMove(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -182,13 +188,13 @@ int ChessBoard::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 6;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 6)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 6;
     }
     return _id;
 }
