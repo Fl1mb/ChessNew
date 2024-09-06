@@ -33,7 +33,10 @@ class ChessBoard : public QGraphicsView{
     Q_OBJECT
 public:
     explicit ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphicsView* parent = nullptr);
+    ~ChessBoard();
 
+    void StopGame() noexcept;
+    void ResumeGame() noexcept;
     void drawBoard() noexcept;
     void addFigures() noexcept;
     void MoveFigure(uint8_t from, uint8_t to) noexcept;
@@ -46,6 +49,7 @@ public:
     void TransformCoordinates(uint8_t& x, uint8_t& y) noexcept;
     void TurnOnAI(uint8_t sideOfAI) noexcept;
 
+    [[nodiscard]] uint8_t getSide() const noexcept;
     [[nodiscard]] uint8_t getStatus() noexcept;
     [[nodiscard]] uint8_t getBlackStatus()  noexcept;
     [[nodiscard]] uint8_t getWhiteStatus() noexcept;
@@ -66,7 +70,6 @@ public:
 public slots:
     void getFigurePrepared(QPair<uint8_t, uint8_t> figure);
     void getFigureMoved(QPair<uint8_t, uint8_t> to);
-    void makeAIMove();
 
 signals:
     void UpdatePosition(const Position& position, uint8_t side);
@@ -75,9 +78,8 @@ signals:
 
 
 private:
-    QGraphicsScene* scene;
+    std::unique_ptr<QGraphicsScene> scene;
     std::array<std::array<BoardElement*, 8>, 8> Elements;
-    AI* ai;
     BoardElement* CheckedSquare;
     PromotionChoice* choice;
 

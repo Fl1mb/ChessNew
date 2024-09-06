@@ -1,9 +1,9 @@
 #include "src/GUI/headers/ChessGUI.h"
 
 
-ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent)
+ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent), numberOfMoves(0)
 {
-    AI::setOpeningBook(":/openingBook/data/openingBook.txt");
+    AI::setOpeningBook("/openingBook/data/openingBook.txt");
     this->StartGameWithAI(WHITE);
 
 }
@@ -11,6 +11,7 @@ ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent)
 
 void ChessGUI::SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side)
 {
+    numberOfMoves++;
     switch(status){
     case GameStatus::DRAW:
         this->addTurnInTable(from, to, status);
@@ -21,25 +22,28 @@ void ChessGUI::SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uin
     case GameStatus::BLACK_TO_MOVE:
         Board->deleteCheck();
         break;
-    case  GameStatus::WHITE_CHECKED:
+    case  GameStatus::WHITE_CHECKED:{
         Board->setKingChecked(WHITE);
         this->addTurnInTableWithStatus(from, to, status);
         return;
-    case GameStatus::BLACK_CHECKED:
+    }
+    case GameStatus::BLACK_CHECKED:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(BLACK);
         return;
-    case GameStatus::WHITE_WIN:
+    }
+    case GameStatus::WHITE_WIN:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(BLACK);
         return;
-    case GameStatus::BLACK_WIN:
+    }
+    case GameStatus::BLACK_WIN:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(WHITE);
         return;
     }
+    }
     this->addTurnInTable(from, to, side);
-
 }
 
 
@@ -96,7 +100,7 @@ void ChessGUI::addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8
     uint8_t x2 = to.first;
     uint8_t y2 = to.second;
 
-    if(side_ != WHITE){
+    if(side_ != BLACK){
         QString fromStr = QString("%1%2").arg(QChar('a' + x1)).arg(8 - y1 );
         QString toStr = QString("%1%2").arg(QChar('a' + x2)).arg(8 - y2 );
 
@@ -155,7 +159,7 @@ void ChessGUI::StartGameWithAI(uint8_t SideOfAI)
 
         this->setCentralWidget(CentralWidget.get());
     }
-    QObject::connect(Board.get(), &ChessBoard::Moved, Board.get(), &ChessBoard::makeAIMove);
+    QObject::connect(Board.get(), &ChessBoard::Moved, this, [&](){this->MakeTurnByAI(Board->getPosition());});
     QObject::connect(Board.get(), &ChessBoard::SentStatus, this , &ChessGUI::SetStatus);
 
 }
@@ -182,6 +186,8 @@ void ChessGUI::addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint
         fromStr = QString("%1%2").arg(QChar('a' + x1)).arg(8 - y1 );
         toStr = QString("%1%2").arg(QChar('a' + x2)).arg(8 - y2 );
         column = 0;
+        fromStr.replace(" ", ""); // Remove spaces
+        toStr.replace(" ", ""); // Remove spaces
         break;
     case WHITE_WIN:
         fromStr = QString("%1%2").arg(QChar('a' + x1)).arg(8 - y1 );
@@ -202,7 +208,37 @@ void ChessGUI::addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint
 
     QTableWidgetItem* item = new QTableWidgetItem(fromStr + "-" + toStr + (statusOfGame == WHITE_CHECKED || statusOfGame == BLACK_CHECKED ? "+" : (statusOfGame == WHITE_WIN || statusOfGame == BLACK_WIN ? "#" : "")));
 
-    int row = TableOfTurns->rowCount(); // Get the current row count
-    TableOfTurns->insertRow(row); // Insert a new row
-    TableOfTurns->setItem(row, column, item);
+    if(numberOfMoves % 2 == 0){
+        int row = TableOfTurns->rowCount(); // Get the current row count
+        TableOfTurns->setItem(row - 1, column, item);
+    }else{
+        int row = TableOfTurns->rowCount(); // Get the current row count
+        TableOfTurns->insertRow(row); // Insert a new row
+        TableOfTurns->setItem(row, column, item);
+    }
+
+}
+
+void ChessGUI::MakeTurnByAI(const Position &position)
+{
+    AIThread* ai = new AIThread(this, position);
+    ai->start();
+}
+
+AIThread::AIThread(ChessGUI *gui, const Position &position) : gui(gui), position(position)
+{
+}
+
+void AIThread::run()
+{
+    Move move = AI::getBestMove(position, gui->Board->getSide() , 200);
+    this->position.move(move);
+    gui->Board->setPosition(position);
+
+    QPair<uint8_t, uint8_t> from{7 - move.getFrom() % 8, 7 - move.getFrom() / 8};
+    QPair<uint8_t, uint8_t> To{7  - move.getTo() % 8, 7 - move.getTo() / 8};
+
+    uint8_t status = gui->Board->getStatus();
+
+    gui->SetStatus(status, from, To, gui->Board->getSide() == WHITE? BLACK : WHITE);
 }

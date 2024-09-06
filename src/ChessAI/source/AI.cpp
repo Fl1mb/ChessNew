@@ -10,7 +10,7 @@ void AI::setOpeningBook(const std::string &path)
 }
 
 Move AI::getBestMove(const Position& position, uint8_t side, int32_t ms) {
-    StaticEvaluator::evaluate(position.getPieces());
+    uint32_t evaluatuion = StaticEvaluator::evaluate(position.getPieces());
     int64_t start = nsecs;
     SearchInterrupter::getPtr()->resume();
 

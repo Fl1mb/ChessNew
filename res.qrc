@@ -16,4 +16,9 @@
     <qresource prefix="/openingBook">
         <file>data/openingBook.txt</file>
     </qresource>
+    <qresource prefix="/sounds">
+        <file>data/Sounds/CheckSound.mp3</file>
+        <file>data/Sounds/MateSound.mp3</file>
+        <file>data/Sounds/MoveSound.mp3</file>
+    </qresource>
 </RCC>

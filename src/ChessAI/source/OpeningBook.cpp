@@ -28,21 +28,23 @@ OpeningBook::OpeningBook(const std::string &path)
 
         buff = {"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", 255, true, true, true, true, 1};
 
-        while(game_thread >>  string_move and game_thread.good()){
+        while(game_thread >>  string_move){
+            if(!game_thread.good())
+                break;
+
             from = (string_move[1] - '1') * 8 + string_move[0] - 'a';
             to = (string_move[3] - '1') * 8 + string_move[2] - 'a';
 
-
             possibleMoves = LegalMoveGen::generate(buff, buff.getMoveCtr() - std::floor(buff.getMoveCtr()) > 1e-7);
-            move_found = false;
 
-            for(uint8_t i = 0 ; i< possibleMoves.size(); i++){
-                if(possibleMoves[i].getFrom() == from and possibleMoves[i].getTo() == to){
+            for (uint8_t i =0 ; i < possibleMoves.size(); i++) {
+                if (possibleMoves[i].getFrom() == from && possibleMoves[i].getTo() == to) {
                     this->moves_.back().push_back(possibleMoves[i]);
                     buff.move(possibleMoves[i]);
                     move_found = true;
                     break;
                 }
+
             }
             if(!move_found){
                 std::cout << "Error in opening book" << std::endl;
