@@ -18,6 +18,7 @@ SOURCES += \
     src/ChessAI/source/SearchInterrupter.cpp \
     src/ChessAI/source/StaticEvaluator.cpp \
     src/ChessAI/source/TranspositionTable.cpp \
+    src/GUI/headers/mainmenu.cpp \
     src/GUI/source/BoardElement.cpp \
     src/GUI/source/ChessBoard.cpp \
     src/GUI/source/ChessGUI.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     src/GUI/headers/ChessBoard.h \
     src/GUI/headers/ChessGUI.h \
     src/GUI/headers/PromotionChoice.h \
+    src/GUI/headers/mainmenu.h \
     src/GameEngine/MoveGen/headers/KingMasks.h \
     src/GameEngine/MoveGen/headers/KnightMask.h \
     src/GameEngine/MoveGen/headers/LegalMoveGen.h \
@@ -68,3 +70,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     res.qrc
+
+FORMS += \
+    src/GUI/headers/mainmenu.ui

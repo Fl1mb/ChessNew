@@ -39,6 +39,7 @@ private:
     void makeConnections() noexcept;
     void addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_) noexcept;
     void StartGameWithAI(uint8_t SideOfAI);
+    void StartGameWithFriend(uint8_t Side);
     void addTurnInTableWithStatus(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t statusOfGame) noexcept;
     void MakeTurnByAI(const Position& position);
 
