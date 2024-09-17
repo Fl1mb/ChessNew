@@ -20,11 +20,6 @@ BoardElement::BoardElement(ColorOfSquare color_, qreal x_, qreal y_, uint8_t ver
 
 }
 
-BoardElement::~BoardElement()
-{
-
-}
-
 void BoardElement::setFigure(uint8_t side_, uint8_t piece_) noexcept
 {
     this->side = side_;

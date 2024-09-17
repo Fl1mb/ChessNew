@@ -10,6 +10,7 @@
 #include <QTransform>
 #include <QGraphicsProxyWidget>
 #include <QObject>
+#include <QMutex>
 #include <QEventLoop>
 #include "src/ChessAI/headers/AI.h"
 #include "BoardElement.h"
@@ -26,7 +27,10 @@ enum GameStatus {
     BLACK_WIN = 4,
 
     WHITE_CHECKED = 5,
-    BLACK_CHECKED = 6
+    BLACK_CHECKED = 6,
+
+    WHITE_LEFT_GAME = 7,
+    BLACK_LEFT_GAME = 8
 };
 
 class ChessBoard : public QGraphicsView{
@@ -44,10 +48,10 @@ public:
     void setKingChecked(uint8_t side_) noexcept;
     void deleteCheck() noexcept;
     void setPosition(const Position& position_) noexcept;
-    void closeEvent(QCloseEvent* event)override;
-    void ChangeSide(uint8_t Side_) noexcept;
+    void ChangeSide() noexcept;
     void TransformCoordinates(uint8_t& x, uint8_t& y) noexcept;
     void TurnOnAI(uint8_t sideOfAI) noexcept;
+    void setFriendFlag(bool flag) noexcept;
 
     [[nodiscard]] uint8_t getSide() const noexcept;
     [[nodiscard]] uint8_t getStatus() noexcept;
@@ -56,6 +60,8 @@ public:
     [[nodiscard]] uint8_t getPromotionChoice() noexcept;
     [[nodiscard]] uint8_t BlackWhiteReverse(uint8_t side) noexcept;
     [[nodiscard]] uint8_t getFlagOfMove(uint8_t from, uint8_t to) noexcept;
+
+    QMutex &getMutex() noexcept;
 
     bool isInsufficientMaterial() noexcept;
     bool isInCheck(uint8_t side_) noexcept;
@@ -73,15 +79,17 @@ public slots:
 
 signals:
     void UpdatePosition(const Position& position, uint8_t side);
-    void Moved();
+    void Moved(Move move);
     void SentStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> To, uint8_t side_);
 
 
 private:
     std::unique_ptr<QGraphicsScene> scene;
-    std::array<std::array<BoardElement*, 8>, 8> Elements;
+    std::array<std::array<std::unique_ptr<BoardElement>, 8>, 8> Elements;
     BoardElement* CheckedSquare;
     PromotionChoice* choice;
+
+    QMutex mutex;
 
     QPair<uint8_t, uint8_t> buffer;
     std::list<uint8_t> LastPossibleMoves;
@@ -91,6 +99,8 @@ private:
 
     bool IsFigureChosen;
     bool IsWhiteMove;
+    bool FriendFlag;
+
 };
 
 #endif // CHESSBOARD_H

@@ -24,7 +24,7 @@ class BoardElement : public QObject, public QGraphicsItem{
     Q_INTERFACES(QGraphicsItem)
 public:
     BoardElement(ColorOfSquare color_ ,qreal x_, qreal y_, uint8_t vert, uint8_t goriz,char num, char let, QObject* parent = nullptr);
-    virtual ~BoardElement() override;
+    virtual ~BoardElement() override = default;
 
     void setFigure(uint8_t side_, uint8_t piece_) noexcept;
     void setPossible(bool isPossible) noexcept;

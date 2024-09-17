@@ -30,13 +30,22 @@ public:
     ChessGUI(StyleOfGame style, QMainWindow* parent = nullptr);
     ~ChessGUI() = default;
 
+    void closeEvent(QCloseEvent* event) override;
+
+    void MoveOnBoard(uint8_t from, uint8_t to) noexcept;
+    void endGame(uint8_t whoWin) noexcept;
+
 public slots:
     void SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side);
+    void MoveSlot(Move move);
+
+
+signals:
+    void sendMove(Move move);
 
 
 private:
     void init();
-    void makeConnections() noexcept;
     void addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side_) noexcept;
     void StartGameWithAI(uint8_t SideOfAI);
     void StartGameWithFriend(uint8_t Side);
@@ -59,6 +68,7 @@ private:
     Position StartPosition{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",Position::NONE, true, true, true, true, 1 };
     GameStatus status;
     SIDE playerTurn;
+    StyleOfGame style_;
 
     friend class AIThread;
 };
