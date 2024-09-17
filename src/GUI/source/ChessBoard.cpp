@@ -1,10 +1,12 @@
 #include "src/GUI/headers/ChessBoard.h"
 
+
 ChessBoard::ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphicsView *parent) : QGraphicsView(parent),
     position(position_),
     side(sideOfPlayer_),
     IsFigureChosen(false),
-    LastPossibleMoves()
+    LastPossibleMoves(),
+    FriendFlag(false)
 {
     this->resize(ChessBoard::size);
     scene = std::make_unique<QGraphicsScene>();
@@ -21,11 +23,7 @@ ChessBoard::ChessBoard(uint8_t sideOfPlayer_, const Position& position_, QGraphi
 
 ChessBoard::~ChessBoard()
 {
-    for(uint8_t i = 0; i < 8; i ++){
-        for(uint8_t j = 0; j < 8; j++){
-            delete Elements[i][j];
-        }
-    }
+
 }
 
 void ChessBoard::StopGame() noexcept
@@ -61,10 +59,10 @@ void ChessBoard::drawBoard() noexcept
                     let = 'a' + i;
                 }
 
-                Elements[i][j] = new BoardElement(color, i * BoardElement::width, j * BoardElement::height, i, j, num, let);
-                scene->addItem(Elements[i][j]);
-                QObject::connect(Elements[i][j], &BoardElement::GetPrepared, this, &ChessBoard::getFigurePrepared);
-                QObject::connect(Elements[i][j], &BoardElement::MakeMove, this, &ChessBoard::getFigureMoved);
+                Elements[i][j] = std::make_unique<BoardElement>(color, i * BoardElement::width, j * BoardElement::height, i, j, num, let);
+                scene->addItem(Elements[i][j].get());
+                QObject::connect(Elements[i][j].get(), &BoardElement::GetPrepared, this, &ChessBoard::getFigurePrepared);
+                QObject::connect(Elements[i][j].get() ,&BoardElement::MakeMove, this, &ChessBoard::getFigureMoved);
             }
         }
     }else{
@@ -80,10 +78,10 @@ void ChessBoard::drawBoard() noexcept
                     let = 'h' - i;
                 }
 
-                Elements[i][j] = new BoardElement(color, i * BoardElement::width, j * BoardElement::height, i, j, num, let);
-                scene->addItem(Elements[i][j]);
-                QObject::connect(Elements[i][j], &BoardElement::GetPrepared, this, &ChessBoard::getFigurePrepared);
-                QObject::connect(Elements[i][j], &BoardElement::MakeMove, this, &ChessBoard::getFigureMoved);
+                Elements[i][j] = std::make_unique<BoardElement>(color, i * BoardElement::width, j * BoardElement::height, i, j, num, let);
+                scene->addItem(Elements[i][j].get());
+                QObject::connect(Elements[i][j].get(), &BoardElement::GetPrepared, this, &ChessBoard::getFigurePrepared);
+                QObject::connect(Elements[i][j].get(), &BoardElement::MakeMove, this, &ChessBoard::getFigureMoved);
             }
         }
     }
@@ -145,8 +143,9 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to) noexcept
     QPair<uint8_t, uint8_t> FROM = Elements[x1][y1]->getCoordinates();
     QPair<uint8_t, uint8_t>TO = Elements[x2][y2]->getCoordinates();
     emit SentStatus(status, FROM, TO, this->side);
-    emit Moved();
+    emit Moved(Move(from, to, Elements[x1][y1]->getPiece(), Elements[x1][y1]->getSide(),Elements[x2][y2]->getPiece(), Elements[x2][y2]->getSide(), flag));
 
+    this->update();
 }
 
 void ChessBoard::ChangeLetters(uint8_t Side_) noexcept
@@ -250,26 +249,38 @@ const Position &ChessBoard::getPosition() const noexcept
 void ChessBoard::setKingChecked(uint8_t side_) noexcept
 {
     if(side_ == WHITE){
-        for(auto i = 0; i < 8; i ++ ){
-            for(auto j = 0; j < 8; j++){
-                if(Elements[i][j]->getPiece() == PIECE::KING and Elements[i][j]->getSide() == BLACK){
-                    Elements[i][j]->setChecked(true);
-                    CheckedSquare = Elements[i][j];
-                    return;
+            for(auto i = 0; i < 8; i ++ ){
+                for(auto j = 0; j < 8; j++){
+                    if(Elements[i][j]->getPiece() == PIECE::KING and Elements[i][j]->getSide() == BLACK){
+                        if(FriendFlag){
+                            Elements[7- i][7 - j]->setChecked(true);
+                            CheckedSquare = Elements[7 - i][7- j].get();
+                        }
+                        else{
+                            Elements[i][j]->setChecked(true);
+                            CheckedSquare = Elements[i][j].get();
+                        }
+                        return;
+                    }
+                }
+            }
+        }else{
+            for(auto i = 0; i < 8; i ++ ){
+                for(auto j = 0; j < 8; j++){
+                    if(Elements[i][j]->getPiece() == PIECE::KING and Elements[i][j]->getSide() == WHITE){
+                        if(FriendFlag){
+                            Elements[7- i][7 - j]->setChecked(true);
+                            CheckedSquare = Elements[7 - i][7- j].get();
+                        }
+                        else{
+                            Elements[i][j]->setChecked(true);
+                            CheckedSquare = Elements[i][j].get();
+                        }
+                        return;
+                    }
                 }
             }
         }
-    }else{
-        for(auto i = 0; i < 8; i ++ ){
-            for(auto j = 0; j < 8; j++){
-                if(Elements[i][j]->getPiece() == PIECE::KING and Elements[i][j]->getSide() == WHITE){
-                    Elements[i][j]->setChecked(true);
-                    CheckedSquare = Elements[i][j];
-                    return;
-                }
-            }
-        }
-    }
 }
 
 void ChessBoard::deleteCheck() noexcept
@@ -300,24 +311,8 @@ void ChessBoard::setPosition(const Position &position_) noexcept
     this->addFigures();
 }
 
-void ChessBoard::closeEvent(QCloseEvent *event)
-{
-    QMessageBox msgBox;
-    msgBox.setText("Do you want to exit the game?");
-    msgBox.setInformativeText("All unsaved progress will be lost.");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::No);
 
-    int ret = msgBox.exec();
-
-    if (ret == QMessageBox::Yes) {
-        event->accept(); // Exit the application
-    } else {
-        event->ignore(); // Cancel the close event
-    }
-}
-
-void ChessBoard::ChangeSide(uint8_t Side_) noexcept
+void ChessBoard::ChangeSide() noexcept
 {
     this->side = this->side == WHITE? BLACK : WHITE;
     this->ChangeLetters(this->side);
@@ -333,6 +328,11 @@ void ChessBoard::TransformCoordinates(uint8_t &x, uint8_t &y) noexcept
 void ChessBoard::TurnOnAI(uint8_t sideOfAi) noexcept
 {
     this->SideOfAI = sideOfAi;
+}
+
+void ChessBoard::setFriendFlag(bool flag) noexcept
+{
+    FriendFlag = flag;
 }
 
 uint8_t ChessBoard::getSide() const noexcept
@@ -445,6 +445,11 @@ uint8_t ChessBoard::getFlagOfMove(uint8_t from, uint8_t to) noexcept
 
 }
 
+QMutex &ChessBoard::getMutex() noexcept
+{
+    return this->mutex;
+}
+
 void ChessBoard::getFigurePrepared(QPair<uint8_t, uint8_t> figure)
 {
     if(IsFigureChosen){
@@ -457,9 +462,8 @@ void ChessBoard::getFigurePrepared(QPair<uint8_t, uint8_t> figure)
     }
 
     buffer = figure;
-    BoardElement* element = Elements[figure.first][figure.second];
 
-    MoveList moves = LegalMoveGen::generate(this->position, element->getSide());
+    MoveList moves = LegalMoveGen::generate(this->position, Elements[figure.first][figure.second]->getSide());
     for(uint8_t i = 0; i < moves.size();i ++){
         if(this->side == WHITE){
             if (moves[i].getFrom() == figure.second * 8 + figure.first) {

@@ -32,6 +32,7 @@ SOURCES += \
     src/GameEngine/PosRep/source/Position.cpp \
     src/GameEngine/PosRep/source/RepetitionHistory.cpp \
     src/GameEngine/PosRep/source/ZobristHash.cpp \
+    src/OnlinePlaying/source/Client.cpp \
     src/main.cpp
 
 HEADERS += \
@@ -61,7 +62,8 @@ HEADERS += \
     src/GameEngine/PosRep/headers/Position.h \
     src/GameEngine/PosRep/headers/RepetitionHistory.h \
     src/GameEngine/PosRep/headers/ZobristHash.h \
-    src/GameEngine/PosRep/headers/ZobristHashConstants.h
+    src/GameEngine/PosRep/headers/ZobristHashConstants.h \
+    src/OnlinePlaying/headers/Client.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

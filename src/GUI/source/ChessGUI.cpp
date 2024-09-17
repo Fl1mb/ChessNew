@@ -1,7 +1,7 @@
 #include "src/GUI/headers/ChessGUI.h"
 
 
-ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent), numberOfMoves(0)
+ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent), numberOfMoves(0), style_(style)
 {
     switch (style) {
     case StyleOfGame::PLAY_WITH_AI:
@@ -13,6 +13,77 @@ ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent)
     default:
         break;
     }
+
+}
+
+void ChessGUI::closeEvent(QCloseEvent *event)
+{
+    QMessageBox message;
+    message.setText("Do you want to exit?");
+    message.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+    message.setDefaultButton(QMessageBox::No);
+
+    if(message.exec() == QMessageBox::Yes){
+        event->accept();
+
+    }else{
+        event->ignore();
+    }
+}
+
+void ChessGUI::MoveOnBoard(uint8_t from, uint8_t to) noexcept
+{
+    this->Board->MoveFigure(from, to);
+}
+
+void ChessGUI::endGame(uint8_t whoWin) noexcept
+{
+    QMessageBox msgBox;
+    switch(whoWin){
+    case WHITE_WIN:
+        this->Board->setEnabled(false);
+        msgBox.setText("WHITE WON!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, "Continue");
+        msgBox.exec();
+        return;
+    case BLACK_WIN:
+        this->Board->setEnabled(false);
+        msgBox.setText("BLACK WON!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, "Continue");
+        msgBox.exec();
+        return;
+    case WHITE_LEFT_GAME:
+        this->Board->setEnabled(false);
+        msgBox.setText("BLACK WON!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, "Continue");
+        msgBox.exec();
+        return;
+    case BLACK_LEFT_GAME:
+        this->Board->setEnabled(false);
+        msgBox.setText("WHITE WON!");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, "Continue");
+        msgBox.exec();
+        return;
+    case DRAW:
+        this->Board->setEnabled(false);
+        msgBox.setText("DRAW");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, "Continue");
+        msgBox.exec();
+        return;
+    default:
+        return;
+    }
+
 
 }
 
@@ -43,15 +114,22 @@ void ChessGUI::SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uin
     case GameStatus::WHITE_WIN:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(BLACK);
+        this->endGame(WHITE_WIN);
         return;
     }
     case GameStatus::BLACK_WIN:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(WHITE);
+        this->endGame(BLACK_WIN);
         return;
     }
     }
     this->addTurnInTable(from, to, side);
+}
+
+void ChessGUI::MoveSlot(Move move)
+{
+    emit sendMove(move);
 }
 
 void ChessGUI::init()
@@ -146,6 +224,7 @@ void ChessGUI::StartGameWithFriend(uint8_t Side)
 {
     Board = std::make_unique<ChessBoard>(WHITE, this->StartPosition);
     Board->setMinimumSize(ChessBoard::size);
+    Board->setFriendFlag(true);
 
     CentralWidget = std::make_unique<QWidget>();
     VerticalLayout = std::make_unique<QVBoxLayout>();
@@ -179,7 +258,7 @@ void ChessGUI::StartGameWithFriend(uint8_t Side)
     this->setCentralWidget(CentralWidget.get());
     this->show();
 
-    QObject::connect(Board.get(), &ChessBoard::Moved, Board.get(), [&](){Board->ChangeSide(BLACK);});
+    QObject::connect(Board.get(), &ChessBoard::Moved, Board.get(), [&](){Board->ChangeSide();});
     QObject::connect(Board.get(), &ChessBoard::SentStatus, this, &ChessGUI::SetStatus);
 }
 
@@ -252,7 +331,9 @@ void AIThread::run()
 {
     Move move = AI::getBestMove(position, gui->Board->getSide() , 200);
     this->position.move(move);
+    gui->Board->getMutex().lock();
     gui->Board->setPosition(position);
+    gui->Board->getMutex().unlock();
 
     if(gui->Board->getSide() == WHITE){
         QPair<uint8_t, uint8_t> from{7 - move.getFrom() % 8, 7 - move.getFrom() / 8};
@@ -266,8 +347,7 @@ void AIThread::run()
         gui->SetStatus(status, from, To, gui->Board->getSide() == WHITE? BLACK : WHITE);
     }
 
-
-
-
-
+    gui->Board->getMutex().lock();
+    gui->Board->update();
+    gui->Board->getMutex().unlock();
 }
