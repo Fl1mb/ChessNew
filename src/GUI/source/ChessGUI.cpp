@@ -1,8 +1,55 @@
 #include "src/GUI/headers/ChessGUI.h"
 
 
-ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent), numberOfMoves(0), style_(style)
+ChessGUI::ChessGUI(StyleOfGame style , uint8_t side_, QMainWindow *parent) : QMainWindow(parent), numberOfMoves(0), style_(style)
 {
+    AI::setOpeningBook("C:\Qt\NewChess\data\openingBook.txt");
+
+    if(side_ == WHITE){
+        Board = std::make_unique<ChessBoard>(WHITE, this->StartPosition);
+    }else{
+        Board = std::make_unique<ChessBoard>(BLACK, this->StartPosition);
+    }
+
+    LeaveButton = std::make_unique<QPushButton>("Leave Game");
+    LeaveButton->setFixedSize(100, 30);
+
+    Board->setMinimumSize(ChessBoard::size);
+
+    CentralWidget = std::make_unique<QWidget>();
+    VerticalLayout = std::make_unique<QVBoxLayout>();
+    BoardAndTable = std::make_unique<QWidget>();
+    LayoutForBoard = std::make_unique<QHBoxLayout>();
+
+    TurnLable = std::make_unique<QLabel>("<b>История ходов<b>");
+    TurnLable->setAlignment(Qt::AlignCenter);
+
+    TableOfTurns = std::make_unique<QTableWidget>();
+    TableOfTurns->setColumnCount(2);
+    TableOfTurns->setHorizontalHeaderLabels({"Ход белых", "Ход черных"});
+    TableOfTurns->setFixedWidth(210);
+    TableOfTurns->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    TurnWidget = std::make_unique<QWidget>();
+    TurnLayout = std::make_unique<QVBoxLayout>();
+
+    TurnLayout->addWidget(TurnLable.get());
+    TurnLayout->addWidget(TableOfTurns.get());
+    TurnWidget->setLayout(TurnLayout.get());
+
+    LayoutForBoard->addWidget(Board.get());
+    LayoutForBoard->addWidget(TurnWidget.get());
+    BoardAndTable->setLayout(LayoutForBoard.get());
+
+    VerticalLayout->addWidget(BoardAndTable.get());
+    VerticalLayout->addWidget(LeaveButton.get());
+    CentralWidget->setLayout(VerticalLayout.get());
+
+    this->setCentralWidget(CentralWidget.get());
+    this->setFixedSize(size);
+
+    QObject::connect(LeaveButton.get(), &QPushButton::clicked, this, &ChessGUI::askAboutExit);
+
     switch (style) {
     case StyleOfGame::PLAY_WITH_AI:
         this->StartGameWithAI(BLACK);
@@ -13,6 +60,17 @@ ChessGUI::ChessGUI(StyleOfGame style, QMainWindow *parent) : QMainWindow(parent)
     default:
         break;
     }
+
+}
+
+ChessGUI::~ChessGUI()
+{
+    // Clean up layouts
+    VerticalLayout->removeWidget(BoardAndTable.get());
+    LayoutForBoard->removeWidget(Board.get());
+    LayoutForBoard->removeWidget(TurnWidget.get());
+    TurnLayout->removeWidget(TurnLable.get());
+    TurnLayout->removeWidget(TableOfTurns.get());
 
 }
 
@@ -36,9 +94,30 @@ void ChessGUI::MoveOnBoard(uint8_t from, uint8_t to) noexcept
     this->Board->MoveFigure(from, to);
 }
 
+void ChessGUI::restartBoard(StyleOfGame style, uint8_t side) noexcept
+{
+    this->Board.reset();
+    TableOfTurns->setRowCount(0);
+
+    if(style == StyleOfGame::PLAY_WITH_AI){
+        this->Board = std::make_unique<ChessBoard>(side, this->StartPosition);
+        this->LayoutForBoard->insertWidget(0,Board.get());
+        this->StartGameWithAI(side);
+        return;
+    }
+    if(style == StyleOfGame::PLAY_WITH_FRIEND){
+        this->Board = std::make_unique<ChessBoard>(side, this->StartPosition);
+        this->LayoutForBoard->insertWidget(0,Board.get());
+        this->StartGameWithFriend(side);
+        return;
+    }
+
+}
+
 void ChessGUI::endGame(uint8_t whoWin) noexcept
 {
     QMessageBox msgBox;
+    QObject::connect(&msgBox, &QMessageBox::finished, this, [&](){emit closeGame();});
     switch(whoWin){
     case WHITE_WIN:
         this->Board->setEnabled(false);
@@ -47,7 +126,7 @@ void ChessGUI::endGame(uint8_t whoWin) noexcept
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setButtonText(QMessageBox::Ok, "Continue");
         msgBox.exec();
-        return;
+        break;
     case BLACK_WIN:
         this->Board->setEnabled(false);
         msgBox.setText("BLACK WON!");
@@ -55,7 +134,7 @@ void ChessGUI::endGame(uint8_t whoWin) noexcept
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setButtonText(QMessageBox::Ok, "Continue");
         msgBox.exec();
-        return;
+        break;
     case WHITE_LEFT_GAME:
         this->Board->setEnabled(false);
         msgBox.setText("BLACK WON!");
@@ -63,7 +142,7 @@ void ChessGUI::endGame(uint8_t whoWin) noexcept
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setButtonText(QMessageBox::Ok, "Continue");
         msgBox.exec();
-        return;
+        break;
     case BLACK_LEFT_GAME:
         this->Board->setEnabled(false);
         msgBox.setText("WHITE WON!");
@@ -71,7 +150,7 @@ void ChessGUI::endGame(uint8_t whoWin) noexcept
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setButtonText(QMessageBox::Ok, "Continue");
         msgBox.exec();
-        return;
+        break;
     case DRAW:
         this->Board->setEnabled(false);
         msgBox.setText("DRAW");
@@ -79,12 +158,21 @@ void ChessGUI::endGame(uint8_t whoWin) noexcept
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.setButtonText(QMessageBox::Ok, "Continue");
         msgBox.exec();
-        return;
+        break;
     default:
-        return;
+        break;
     }
+}
 
-
+void ChessGUI::askAboutExit()
+{
+    QMessageBox msg;
+    msg.setText("Do you want to leave game?");
+    msg.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msg.setDefaultButton(QMessageBox::No);
+    if(msg.exec() == QMessageBox::Yes){
+        emit closeGame();
+    }
 }
 
 
@@ -114,17 +202,19 @@ void ChessGUI::SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uin
     case GameStatus::WHITE_WIN:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(BLACK);
-        this->endGame(WHITE_WIN);
+        emit gameFinished(WHITE_WIN);
         return;
     }
     case GameStatus::BLACK_WIN:{
         this->addTurnInTableWithStatus(from, to, status);
         Board->setKingChecked(WHITE);
-        this->endGame(BLACK_WIN);
+        emit gameFinished(BLACK_WIN);
         return;
     }
     }
     this->addTurnInTable(from, to, side);
+
+
 }
 
 void ChessGUI::MoveSlot(Move move)
@@ -172,47 +262,10 @@ void ChessGUI::addTurnInTable(QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8
 
 void ChessGUI::StartGameWithAI(uint8_t SideOfAI)
 {
-    AI::setOpeningBook("C:\Qt\NewChess\data\openingBook.txt");
-    if(SideOfAI == WHITE){
-        Board = std::make_unique<ChessBoard>(WHITE, this->StartPosition);
-    }else{
-        Board = std::make_unique<ChessBoard>(BLACK, this->StartPosition);
-    }
 
-    Board->setMinimumSize(ChessBoard::size);
-
-    CentralWidget = std::make_unique<QWidget>();
-    VerticalLayout = std::make_unique<QVBoxLayout>();
-    BoardAndTable = std::make_unique<QWidget>();
-    LayoutForBoard = std::make_unique<QHBoxLayout>();
-
-    TurnLable = std::make_unique<QLabel>("<b>История ходов<b>");
-    TurnLable->setAlignment(Qt::AlignCenter);
-
-    TableOfTurns = std::make_unique<QTableWidget>();
-    TableOfTurns->setColumnCount(2);
-    TableOfTurns->setHorizontalHeaderLabels({"Ход белых", "Ход черных"});
-    TableOfTurns->setFixedWidth(210);
-    TableOfTurns->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    TurnWidget = std::make_unique<QWidget>();
-    TurnLayout = std::make_unique<QVBoxLayout>();
-
-    TurnLayout->addWidget(TurnLable.get());
-    TurnLayout->addWidget(TableOfTurns.get());
-    TurnWidget->setLayout(TurnLayout.get());
-
-    LayoutForBoard->addWidget(Board.get());
-    LayoutForBoard->addWidget(TurnWidget.get());
-    BoardAndTable->setLayout(LayoutForBoard.get());
-
-    VerticalLayout->addWidget(BoardAndTable.get());
-    CentralWidget->setLayout(VerticalLayout.get());
-
-
-    this->setCentralWidget(CentralWidget.get());
     QObject::connect(Board.get(), &ChessBoard::Moved, this, [&](){this->MakeTurnByAI(Board->getPosition());});
     QObject::connect(Board.get(), &ChessBoard::SentStatus, this , &ChessGUI::SetStatus);
+    QObject::connect(this, &ChessGUI::gameFinished, this, &ChessGUI::endGame);
 
     if(SideOfAI == BLACK){
         this->MakeTurnByAI(Board->getPosition());
@@ -222,44 +275,9 @@ void ChessGUI::StartGameWithAI(uint8_t SideOfAI)
 
 void ChessGUI::StartGameWithFriend(uint8_t Side)
 {
-    Board = std::make_unique<ChessBoard>(WHITE, this->StartPosition);
-    Board->setMinimumSize(ChessBoard::size);
-    Board->setFriendFlag(true);
-
-    CentralWidget = std::make_unique<QWidget>();
-    VerticalLayout = std::make_unique<QVBoxLayout>();
-    BoardAndTable = std::make_unique<QWidget>();
-    LayoutForBoard = std::make_unique<QHBoxLayout>();
-
-    TurnLable = std::make_unique<QLabel>("<b>История ходов<b>");
-    TurnLable->setAlignment(Qt::AlignCenter);
-
-    TableOfTurns = std::make_unique<QTableWidget>();
-    TableOfTurns->setColumnCount(2);
-    TableOfTurns->setHorizontalHeaderLabels({"Ход белых", "Ход черных"});
-    TableOfTurns->setFixedWidth(210);
-    TableOfTurns->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    TurnWidget = std::make_unique<QWidget>();
-    TurnLayout = std::make_unique<QVBoxLayout>();
-
-    TurnLayout->addWidget(TurnLable.get());
-    TurnLayout->addWidget(TableOfTurns.get());
-    TurnWidget->setLayout(TurnLayout.get());
-
-    LayoutForBoard->addWidget(Board.get());
-    LayoutForBoard->addWidget(TurnWidget.get());
-    BoardAndTable->setLayout(LayoutForBoard.get());
-
-    VerticalLayout->addWidget(BoardAndTable.get());
-    CentralWidget->setLayout(VerticalLayout.get());
-
-
-    this->setCentralWidget(CentralWidget.get());
-    this->show();
-
     QObject::connect(Board.get(), &ChessBoard::Moved, Board.get(), [&](){Board->ChangeSide();});
     QObject::connect(Board.get(), &ChessBoard::SentStatus, this, &ChessGUI::SetStatus);
+    QObject::connect(this, &ChessGUI::gameFinished, this, &ChessGUI::endGame);
 }
 
 
@@ -333,21 +351,22 @@ void AIThread::run()
     this->position.move(move);
     gui->Board->getMutex().lock();
     gui->Board->setPosition(position);
-    gui->Board->getMutex().unlock();
+
 
     if(gui->Board->getSide() == WHITE){
         QPair<uint8_t, uint8_t> from{7 - move.getFrom() % 8, 7 - move.getFrom() / 8};
         QPair<uint8_t, uint8_t> To{7  - move.getTo() % 8, 7 - move.getTo() / 8};
         uint8_t status = gui->Board->getStatus();
-        gui->SetStatus(status, from, To, gui->Board->getSide() == WHITE? BLACK : WHITE);
+        this->gui->SetStatus(status, from, To, this->gui->Board->getSide() == WHITE? BLACK : WHITE);
+
     }else{
         QPair<uint8_t, uint8_t> from{move.getFrom() % 8, move.getFrom() / 8};
         QPair<uint8_t, uint8_t> To{move.getTo() % 8,  move.getTo() / 8};
         uint8_t status = gui->Board->getStatus();
-        gui->SetStatus(status, from, To, gui->Board->getSide() == WHITE? BLACK : WHITE);
+        this->gui->SetStatus(status, from, To, gui->Board->getSide() == WHITE? BLACK : WHITE);
     }
 
-    gui->Board->getMutex().lock();
-    gui->Board->update();
     gui->Board->getMutex().unlock();
 }
+
+

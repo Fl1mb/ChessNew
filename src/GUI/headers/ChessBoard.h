@@ -44,6 +44,7 @@ public:
     void drawBoard() noexcept;
     void addFigures() noexcept;
     void MoveFigure(uint8_t from, uint8_t to) noexcept;
+    void MoveFigure(const Move& move) noexcept;
     void ChangeLetters(uint8_t Side_) noexcept;
     void setKingChecked(uint8_t side_) noexcept;
     void deleteCheck() noexcept;

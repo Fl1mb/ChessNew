@@ -6,7 +6,12 @@ MainMenu::MainMenu(QWidget *parent) :
     ui(new Ui::MainMenu)
 {
     ui->setupUi(this);
-    gui = nullptr;
+
+    socket = std::make_unique<ClientSocket>();
+    if(socket->isConnected)
+        ui->PlayWithFriendOnl->setEnabled(true);
+    else
+        ui->PlayWithFriendOnl->setEnabled(false);
 
     QObject::connect(ui->PlayWithFriendOFF, &QPushButton::clicked, this, &MainMenu::StartPlayWithFriend);
     QObject::connect(ui->PlayAI, &QPushButton::clicked, this, &MainMenu::StartPlayWithAI);
@@ -15,26 +20,48 @@ MainMenu::MainMenu(QWidget *parent) :
 
 MainMenu::~MainMenu()
 {
-    delete ui;
-    if(gui != nullptr)
-        delete gui;
 }
 
 void MainMenu::StartPlayWithAI()
 {
-    gui = new ChessGUI(StyleOfGame::PLAY_WITH_AI);
+    if (gui) {
+        gui->restartBoard(StyleOfGame::PLAY_WITH_AI, WHITE);
+        gui->show();
+        this->hide();
+        QObject::connect(gui.get(), &ChessGUI::closeGame, this, &MainMenu::closeGame);
+        return;
+    }
+    gui = std::make_unique<ChessGUI>(StyleOfGame::PLAY_WITH_FRIEND, WHITE);
     gui->show();
     this->hide();
+
+    QObject::connect(gui.get(), &ChessGUI::closeGame, this, &MainMenu::closeGame);
 }
 
 void MainMenu::StartPlayWithFriend()
 {
-    gui = new ChessGUI(StyleOfGame::PLAY_WITH_FRIEND);
+    if (gui) {
+        gui->restartBoard(StyleOfGame::PLAY_WITH_FRIEND, WHITE);
+        gui->show();
+        this->hide();
+        return;
+
+    }
+    gui = std::make_unique<ChessGUI>(StyleOfGame::PLAY_WITH_FRIEND, WHITE);
     gui->show();
     this->hide();
+
+    QObject::connect(gui.get(), &ChessGUI::closeGame, this, &MainMenu::closeGame);
 }
 
 void MainMenu::StartPlayOnline()
 {
+
+}
+
+void MainMenu::closeGame()
+{
+    this->gui->hide();
+    this->show();
 
 }

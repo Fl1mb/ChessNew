@@ -148,6 +148,13 @@ void ChessBoard::MoveFigure(uint8_t from, uint8_t to) noexcept
     this->update();
 }
 
+void ChessBoard::MoveFigure(const Move &move) noexcept
+{
+    uint8_t from = move.getFrom();
+    uint8_t to = move.getTo();
+    this->MoveFigure(from, to);
+}
+
 void ChessBoard::ChangeLetters(uint8_t Side_) noexcept
 {
     if (Side_ == WHITE) {

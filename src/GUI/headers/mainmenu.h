@@ -2,7 +2,9 @@
 #define MAINMENU_H
 
 #include <QDialog>
+#include "src/OnlinePlaying/headers/Client.h"
 #include "ChessGUI.h"
+#include <memory>
 
 namespace Ui {
 class MainMenu;
@@ -21,9 +23,16 @@ public slots:
     void StartPlayWithFriend();
     void StartPlayOnline();
 
+    void closeGame();
+
 private:
-    Ui::MainMenu *ui;
-    ChessGUI* gui;
+    QString UserName;
+    QString Password;
+
+    std::unique_ptr<Ui::MainMenu> ui;
+    std::unique_ptr<ChessGUI> gui;
+    std::unique_ptr<ClientSocket> socket;
+
 };
 
 #endif // MAINMENU_H

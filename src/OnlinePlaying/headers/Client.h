@@ -46,6 +46,7 @@ private:
     bool isConnected;
     bool gameIsStarted;
 
+    friend class MainMenu;
 
 };
 

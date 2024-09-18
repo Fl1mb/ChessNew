@@ -27,22 +27,28 @@ enum class StyleOfGame: uint8_t{
 class ChessGUI : public QMainWindow{
     Q_OBJECT
 public:
-    ChessGUI(StyleOfGame style, QMainWindow* parent = nullptr);
-    ~ChessGUI() = default;
+    ChessGUI(StyleOfGame style, uint8_t side_, QMainWindow* parent = nullptr);
+    ~ChessGUI();
 
     void closeEvent(QCloseEvent* event) override;
 
     void MoveOnBoard(uint8_t from, uint8_t to) noexcept;
-    void endGame(uint8_t whoWin) noexcept;
+    void restartBoard(StyleOfGame style, uint8_t side) noexcept;
+
+    static constexpr QSize size{848, 640};
 
 public slots:
     void SetStatus(uint8_t status, QPair<uint8_t, uint8_t> from, QPair<uint8_t, uint8_t> to, uint8_t side);
     void MoveSlot(Move move);
+    void endGame(uint8_t whoWin) noexcept;
+    void askAboutExit();
+
 
 
 signals:
     void sendMove(Move move);
-
+    void gameFinished(uint8_t status);
+    void closeGame();
 
 private:
     void init();
@@ -62,6 +68,7 @@ private:
     std::unique_ptr<ChessBoard> Board;
     std::unique_ptr<QWidget> CentralWidget;
     std::unique_ptr<QVBoxLayout> VerticalLayout;
+    std::unique_ptr<QPushButton> LeaveButton;
 
     uint32_t numberOfMoves;
 
@@ -80,6 +87,8 @@ public:
     AIThread(ChessGUI* gui, const Position& position);
 
     void run() override;
+signals:
+    void changeStatus(uint8_t status);
 
 private:
     ChessGUI* gui;
